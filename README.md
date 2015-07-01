@@ -1,7 +1,7 @@
 # dwa-hacks
 
 # Contributers
-- Maninya Manthram
+- Maninya M
 - Nishant Singh
 - Sumit Pandey
 - Usama Ghufran
