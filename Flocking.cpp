@@ -1,6 +1,6 @@
 #include "Flocking.h"
 
-using namespace geometry;
+using namespace math;
 
 
 ////////////////
@@ -24,7 +24,7 @@ Boid::Boid(int id, Vec2d location, Vec2i borderMin, Vec2i borderMax, bool border
     maxForce(maxForce)
 {
     Vec2i center = borderMin + ((borderMax - borderMin) / 2);
-    borderCenter = Vec2d(center.x, center.y, center.z);
+    borderCenter = Vec2d(center.x, center.y);
 }
 
 void Boid::run(const std::vector<Boid*>& boids)
@@ -52,7 +52,7 @@ void Boid::update()
     acceleration = acceleration * 0;
 }
 
-geometry::Vec2d Boid::steer(geometry::Vec2d target)
+Vec2d Boid::steer(Vec2d target)
 {
     Vec2d desired = target - location;
     double distance = desired.length();
@@ -65,10 +65,9 @@ geometry::Vec2d Boid::steer(geometry::Vec2d target)
         steer.limit(maxForce);
         return steer;
     }
-
     else
     {
-        return Vec2d(0, 0, 0);
+        return Vec2d(0, 0);
     }
 }
 
@@ -77,12 +76,12 @@ void Boid::seek(Vec2d target)
     acceleration += steer(target);
 }
 
-geometry::Vec2d Boid::separate(const std::vector<Boid*>& boids)
+math::Vec2d Boid::separate(const std::vector<Boid*>& boids)
 {
-    Vec2d steer(0, 0, 0);
+    Vec2d steer(0, 0);
     int count = 0;
 
-    for(int i = 0; i < boids.size(); ++i)
+    for(size_t i = 0; i < boids.size(); ++i)
     {
         Boid* boid = boids[i];
         double distance = location.distance(boid->getLocation());
@@ -124,12 +123,12 @@ void Boid::flock(const std::vector<Boid*>& boids)
     applyForce(cohesionForce);
 }
 
-geometry::Vec2d Boid::align(const std::vector<Boid*>& boids)
+math::Vec2d Boid::align(const std::vector<Boid*>& boids)
 {
-    Vec2d sum(0, 0, 0);
+    Vec2d sum(0, 0);
     int count = 0;
 
-    for(int i = 0; i < boids.size(); ++i)
+    for(size_t i = 0; i < boids.size(); ++i)
     {
         Boid* boid = boids[i];
         double distance = location.distance(boid->getLocation());
@@ -153,16 +152,16 @@ geometry::Vec2d Boid::align(const std::vector<Boid*>& boids)
 
     else
     {
-        return Vec2d(0, 0, 0);
+        return Vec2d(0, 0);
     }
 }
 
-geometry::Vec2d Boid::cohesion(const std::vector<Boid*>& boids)
+math::Vec2d Boid::cohesion(const std::vector<Boid*>& boids)
 {
-    Vec2d sum(0, 0, 0);
+    Vec2d sum(0, 0);
     int count = 0;
 
-    for(int i = 0; i < boids.size(); ++i)
+    for(size_t i = 0; i < boids.size(); ++i)
     {
         Boid* boid = boids[i];
         double distance = location.distance(boid->getLocation());
@@ -181,7 +180,7 @@ geometry::Vec2d Boid::cohesion(const std::vector<Boid*>& boids)
 
     else
     {
-        return Vec2d(0, 0, 0);
+        return Vec2d(0, 0);
     }
 }
 
@@ -189,7 +188,7 @@ void Boid::drift()
 {
     double radius = 30.0;
     double diameter = 60.0;
-    int driftBounds = 0.45;
+    int driftBounds = 45;
     driftAngle += randomRange<int>(-driftBounds, driftBounds);
 
     Vec2d center = velocity;
@@ -219,18 +218,18 @@ void Boid::wrapToBorders()
         location.y = borderMax.y -1;
 
     // Wrap z coordinate
-    if(location.z >= borderMax.z)
-        location.z = borderMin.z;
+    //if(location.z >= borderMax.z)
+    //    location.z = borderMin.z;
 
-    else if(location.z < borderMin.z)
-        location.z = borderMax.z -1;
+   // else if(location.z < borderMin.z)
+   //     location.z = borderMax.z -1;
 }
 
 void Boid::borderRepulse()
 {
     if(location.x < borderMin.x || location.x > borderMax.x
-            || location.y < borderMin.y || location.y > borderMax.y
-            || location.z < borderMin.z || location.z > borderMax.z)
+            || location.y < borderMin.y || location.y > borderMax.y)
+    //        || location.z < borderMin.z || location.z > borderMax.z)
     {
         seek(borderCenter);
     }
@@ -256,12 +255,12 @@ Vec2d Boid::getLocation()
     return location;
 }
 
-geometry::Vec2d Boid::getVelocity()
+math::Vec2d Boid::getVelocity()
 {
     return velocity;
 }
 
-geometry::Vec2d Boid::getAcceleration()
+math::Vec2d Boid::getAcceleration()
 {
     return acceleration;
 }
@@ -297,7 +296,7 @@ Flock::~Flock()
 
 void Flock::run()
 {
-    for(int i = 0; i < boids.size(); ++i)
+    for(size_t i = 0; i < boids.size(); ++i)
     {
         boids[i]->run(boids);
     }
@@ -305,7 +304,7 @@ void Flock::run()
 
 void Flock::seek(Vec2d target)
 {
-    for(int i = 0; i < boids.size(); ++i)
+    for(size_t i = 0; i < boids.size(); ++i)
     {
         boids[i]->seek(target);
     }
@@ -313,7 +312,7 @@ void Flock::seek(Vec2d target)
 
 void Flock::drift()
 {
-    for(int i = 0; i < boids.size(); ++i)
+    for(size_t i = 0; i < boids.size(); ++i)
     {
         boids[i]->drift();
     }
@@ -336,7 +335,7 @@ int Flock::addBoid(Boid *boid)
 
 void Flock::removeBoid(int id)
 {
-    for(int i = 0; i < boids.size(); ++i)
+    for(size_t i = 0; i < boids.size(); ++i)
     {
         if(id == boids[i]->getID())
         {
@@ -348,7 +347,7 @@ void Flock::removeBoid(int id)
 
 void Flock::clear()
 {
-    for(int i = 0; i < boids.size(); ++i)
+    for(size_t i = 0; i < boids.size(); ++i)
     {
         delete boids[i];
     }
@@ -370,7 +369,7 @@ void Flock::setBorderWrapping(bool borderWrapping)
 {
     this->borderWrapping = borderWrapping;
 
-    for(int i = 0; i < boids.size(); ++i)
+    for(size_t i = 0; i < boids.size(); ++i)
     {
         boids[i]->setBorderWrapping(borderWrapping);
     }

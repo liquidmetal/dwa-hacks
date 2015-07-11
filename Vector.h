@@ -4,17 +4,17 @@
 #include <cmath>
 #include <iostream>
 
-namespace geometry {
+namespace math {
 
-template <class T>
-    
+template <class T>    
 inline T randomRange(T minValue, T maxValue)
 {
     return minValue + (rand() % (T)(maxValue - minValue + 1));
 }
 
-struct Vec2 {
-
+template <class T>
+class Vec2 {
+public:
     T x, y;
 
     Vec2(T x = 0, T y = 0) : x(x), y(y) { }
@@ -173,8 +173,8 @@ struct Vec2 {
 };
 
 template <class T>
-struct Vec3 {
-
+class Vec3 {
+public:
     T x, y, z;
 
     Vec3(T x = 0, T y = 0, T z = 0) : x(x), y(y), z(z) { }
@@ -350,6 +350,6 @@ typedef Vec3<int> Vec3i;
 typedef Vec3<float> Vec3f;
 typedef Vec3<double> Vec3d;
 
-} // geometry namespace
+} // math namespace
 
 #endif // VECTOR_H

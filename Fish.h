@@ -15,16 +15,16 @@ public:
 	{
 	}
 
-	Vec3& position() {
+	Vec3d& position() {
 		return mPosition;
 	}
-	const Vec3& position() const {
+	const Vec3d& position() const {
 		return mPosition;
 	}
-	const Vec3& minDistance() const {
+	const Vec3d& minDistance() const {
 		return mMinDistance;
 	}
-	const Vec3& maxDistance() const {
+	const Vec3d& maxDistance() const {
 		return mMaxDistance;
 	}
 	float maxAcceleration() const {
