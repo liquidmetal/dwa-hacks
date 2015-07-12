@@ -12,7 +12,7 @@ PathFinder::PathFinder(SearchNode* startNode, SearchNode* endNode)
 SearchNode*
 PathFinder::getNextNode()
 {
-	float bestCost = std::numeric_limits<float>::max();
+	double bestCost = std::numeric_limits<float>::max();
 	int nodeIndex = -1;
 	size_t i = 0;
 	SearchNode* nextNode = nullptr;
@@ -38,7 +38,7 @@ PathFinder::getNextNode()
 }
 
 void
-PathFinder::searchNode(int x, int y, float movementCost, SearchNode* parent)
+PathFinder::searchNode(unsigned int x,unsigned int y, double movementCost, SearchNode* parent)
 {
 	if (!mScene->getCell(x, y).passable)
 	{
@@ -107,4 +107,26 @@ PathFinder::searchPath()
 		searchNode(node->x + 1, node->y - 1, node->movementCost + 1.414, node);
 		searchNode(node->x - 1, node->y - 1, node->movementCost + 1.414, node);
 	}
+}
+
+void
+PathFinder::cleanup()
+{
+	delete mEndNode;
+	delete mStartNode;
+
+	for (SearchNode* node : mOpenList)
+	{
+		delete node;
+	}
+
+	for (SearchNode* node : mClosedList)
+	{
+		delete node;
+	}
+
+	mFoundPath = false;
+	mPath.clear();
+	mOpenList.clear();
+	mClosedList.clear();
 }

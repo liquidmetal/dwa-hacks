@@ -12,13 +12,13 @@ struct SearchNode
 	int y;
 	int id;
 	SearchNode* parent;
-	float movementCost;
-	float hueristicCost;
+	double movementCost;
+	double hueristicCost;
 
 	SearchNode(int x, int y, int id, SearchNode* parent = nullptr) 
 		: parent(parent), x(x), y(y), id(id), movementCost(0), hueristicCost(0) {}
 
-	float getExpectedCost() const
+	double getExpectedCost() const
 	{
 		return movementCost + hueristicCost;
 	}
@@ -39,10 +39,15 @@ public:
 	{
 		return mFoundPath;
 	}
+	~PathFinder()
+	{
+		cleanup();
+	}
 private:
 	SearchNode* getNextNode();
 	void searchPath();
-	void searchNode(int x, int y, float cost, SearchNode* parent);
+	void searchNode(unsigned int x, unsigned int y, double cost, SearchNode* parent);
+	void cleanup();
 
 	std::vector<SearchNode*> mOpenList;
 	std::vector<SearchNode*> mClosedList;

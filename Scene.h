@@ -12,8 +12,14 @@ struct Cell
 class Scene
 {
 public:
-	const Grid<Cell>& getGrid() const;
-	Cell getCell(int x, int y);
+	const Grid<Cell>& getGrid() const
+	{
+		return mGrid;
+	}
+	Cell getCell(unsigned int x, unsigned int y)
+	{
+		return mGrid.getValue(x, y);
+	}
 private:
 	Grid<Cell> mGrid;
 };
