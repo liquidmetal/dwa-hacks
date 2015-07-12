@@ -1,5 +1,4 @@
-#ifndef FLOCKING_H
-#define FLOCKING_H
+#pragma once
 
 // System includes
 #include <vector>
@@ -96,7 +95,4 @@ private:
     bool borderRepulsion;
     int boidIDCounter;
 };
-
-
-#endif // FLOCKING_H
 
