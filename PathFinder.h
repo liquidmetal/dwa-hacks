@@ -4,6 +4,10 @@
 #include "Scene.h"
 #include <set> 
 
+#ifdef __LINUX_COMPILE
+#include <limits>
+#endif
+
 using namespace math;
 
 struct SearchNode

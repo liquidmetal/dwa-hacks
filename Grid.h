@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __LINUX_COMPILE
+#include<memory.h>
+#endif
+
 template <class T>
 class Grid
 {
