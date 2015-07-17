@@ -1,11 +1,13 @@
 #pragma once
 
-#include <Math.h>
+#include "Vector.h"
+
+using namespace math;
 
 class Fish
 {
 public:
-	Fish(const Vec3& position, const Vec3& minDistance, const Vec3& maxDistance, float maxAcceleration, float maxRotation, float maxSpeed)
+	Fish(const Vec3d& position, const Vec3d& minDistance, const Vec3d& maxDistance, float maxAcceleration, float maxRotation, float maxSpeed)
 		: mPosition(position)
 		, mMinDistance(minDistance)
 		, mMaxDistance(maxDistance)
@@ -15,16 +17,16 @@ public:
 	{
 	}
 
-	Vec3& position() {
+	Vec3d& position() {
 		return mPosition;
 	}
-	const Vec3& position() const {
+	const Vec3d& position() const {
 		return mPosition;
 	}
-	const Vec3& minDistance() const {
+	const Vec3d& minDistance() const {
 		return mMinDistance;
 	}
-	const Vec3& maxDistance() const {
+	const Vec3d& maxDistance() const {
 		return mMaxDistance;
 	}
 	float maxAcceleration() const {
@@ -38,10 +40,10 @@ public:
 		return mMaxSpeed;
 	}
 private:
-	Vec3 mPosition;
-	Vec3 mOrientation;
-	Vec3 mMinDistance;
-	Vec3 mMaxDistance;
+	Vec3d mPosition;
+	Vec3d mOrientation;
+	Vec3d mMinDistance;
+	Vec3d mMaxDistance;
 	float mMaxAcceleration;
 	float mMaxRotation;
 	float mMaxSpeed;
