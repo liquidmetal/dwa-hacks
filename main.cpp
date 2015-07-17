@@ -5,7 +5,7 @@ int main(int argc, char* argv[])
 {
     if(argc==1) {
         printf("Please use the following syntax to invoke this command\n");
-        printf("%s <map-path>\n");
+        printf("%s <map-path>\n", argv[0]);
         return 1;
     }
 
