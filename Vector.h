@@ -1,5 +1,4 @@
-#ifndef VECTOR_H
-#define VECTOR_H
+#pragma once
 
 #include <cmath>
 #include <iostream>
@@ -351,5 +350,3 @@ typedef Vec3<float> Vec3f;
 typedef Vec3<double> Vec3d;
 
 } // math namespace
-
-#endif // VECTOR_H

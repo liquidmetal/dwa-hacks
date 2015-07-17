@@ -1,7 +1,12 @@
-#include "Grid.h"
+#include "Simulation.h"
+#include <iostream>
 
 int main()
 {
-	Grid<int> grid(10, 10);
+	Simulation simulation;
+	simulation.loadScene();
+	simulation.init();
+	simulation.run();
+	std::cout << "Total Simulation Time : " << simulation.totalTime() << std::endl;
 	return 0;
 }

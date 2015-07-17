@@ -33,8 +33,7 @@ struct SearchNode
 class PathFinder
 {
 public:
-	PathFinder(SearchNode* startCell, SearchNode* endCell);
-	const std::vector<Vec2f>& getPath(const Scene& scene);
+	std::vector<Vec2d> getPath(Scene* scene);
 	bool foundPath() const
 	{
 		return mFoundPath;

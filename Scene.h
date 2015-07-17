@@ -12,14 +12,32 @@ struct Cell
 class Scene
 {
 public:
-	const Grid<Cell>& getGrid() const
+	Scene(const Vec2d& startPosition, const Vec2d& endPosition, const Grid<bool>& grid)
+		:mStartPosition(startPosition)
+		,mEndPosition(endPosition)
+		,mGrid(grid)
+	{
+	}
+
+	Vec2d getStartPosition() const
+	{
+		return mStartPosition;
+	}
+	Vec2d getEndPosition() const
+	{
+		return mEndPosition;
+	}
+
+	const Grid<bool>& getGrid() const
 	{
 		return mGrid;
 	}
-	Cell getCell(unsigned int x, unsigned int y)
+	bool getCell(unsigned int x, unsigned int y)
 	{
 		return mGrid.getValue(x, y);
 	}
 private:
-	Grid<Cell> mGrid;
+	Grid<bool> mGrid;
+	Vec2d mStartPosition;
+	Vec2d mEndPosition;
 };

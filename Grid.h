@@ -4,9 +4,9 @@ template <class T>
 class Grid
 {
 public:
-	Grid(unsigned int x, unsigned int y)
+	Grid(unsigned int x, unsigned int y, T* data)
 	{
-		mData = new T[x * y];
+		mData = data;
 		mMaxX = x;
 		mMaxY = y;
 	}
@@ -24,6 +24,19 @@ public:
 	T& getValue(unsigned int x, unsigned int y)
 	{
 		return mData[y*mMaxX + x];
+	}
+
+	~Grid() 
+	{
+		delete[] mData;
+	}
+
+	Grid(const Grid& grid) 
+	{
+		mMaxX = grid.mMaxX;
+		mMaxX = grid.mMaxY;
+		mData = new T[mMaxY * mMaxX];
+		memcpy(mData, grid.mData, sizeof(T) * mMaxX * mMaxY);
 	}
 private:
 	T* mData;

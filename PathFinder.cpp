@@ -1,12 +1,30 @@
 #include "PathFinder.h"
 
-PathFinder::PathFinder(SearchNode* startNode, SearchNode* endNode)
-	: mStartNode(startNode)
-	, mEndNode(endNode)
-	, mFoundPath(false)
+std::vector<Vec2d>
+PathFinder::getPath(Scene* scene)
 {
-	mOpenList.push_back(startNode);
+	cleanup();
+	mScene = scene;
+	int startX = (int)mScene->getStartPosition().x;
+	int startY = (int)mScene->getStartPosition().y;
+	int startId = startY * mScene->getGrid().getMaxX() + startX;
+	mStartNode = new SearchNode(startX, startY, startId);
+
+	int endX = (int)mScene->getEndPosition().x;
+	int endY = (int)mScene->getEndPosition().y;
+	int endId = endX * mScene->getGrid().getMaxX() + endX;
+	mEndNode = new SearchNode(endX, endY, endId);
+
+	mOpenList.push_back(mStartNode);
+
 	searchPath();
+
+	if (mFoundPath) {
+		return mPath;
+	}
+	else {
+		return std::vector<Vec2d>();
+	}
 }
 
 SearchNode*
@@ -40,7 +58,7 @@ PathFinder::getNextNode()
 void
 PathFinder::searchNode(unsigned int x,unsigned int y, double movementCost, SearchNode* parent)
 {
-	if (!mScene->getCell(x, y).passable)
+	if (!mScene->getCell(x, y))
 	{
 		return;
 	}
