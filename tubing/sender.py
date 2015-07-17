@@ -15,6 +15,8 @@ import simplejson
 
 from codecs import utf_8_encode
 
+MAP_PATH = '/tmp/maps'
+
 class SimHandler(tornado.websocket.WebSocketHandler):
     """
     """
@@ -65,20 +67,60 @@ class SimHandler(tornado.websocket.WebSocketHandler):
         os.close(self.fp)
         return
 
+class MapUploadHandler(tornado.web.RequestHandler):
+    def post(self):
+        if os.path.exists(MAP_PATH):
+            if not os.path.isdir(MAP_PATH):
+                os.remove(MAP_PATH)
+                os.mkdir(MAP_PATH)
+        else:
+            os.mkdir(MAP_PATH)
+        file_data = self.request.files['file'][0]
+
+        with open('%s/%s' % (MAP_PATH, file_data['filename']), 'w') as fp:
+            fp.write(file_data['body'])
+
+        return
+
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         fp = open("./index.html")
         self.write(fp.read())
         fp.close()
+        return
+
+class MapListHandler(tornado.web.RequestHandler):
+    def get(self):
+        maps = os.listdir(MAP_PATH)
+
+        ret = {}
+        ret['maps'] = []
+        ret['map_count'] = len(maps)
+
+        for m in maps:
+            with open("%s/%s" % (MAP_PATH, m), 'r') as fp:
+                map_width = len(fp.readline())
+                map_height = sum(1 for line in fp) + 1
+
+            ret['maps'].append({'name': m, 'width': map_width, 'height': map_height})
+
+        self.set_header('Content-Type', 'application/json')
+        self.write(simplejson.dumps(ret))
+        return
+
+                
 
 def start_server():
     """
     """
-    application = tornado.web.Application([
-            (r"/", MainHandler),
-            (r"/sim", SimHandler),
-            (r"/static/(.*)", tornado.web.StaticFileHandler, {"path": "./static/"}),
-        ])
+    routes = [(r"/", MainHandler),
+              (r"/sim", SimHandler),
+              (r"/map_list", MapListHandler),
+              (r"/upload_map", MapUploadHandler),
+              (r"/static/(.*)", tornado.web.StaticFileHandler, {"path": "./static/"}),
+             ]
+
+    application = tornado.web.Application(routes, debug=True)
 
     application.listen(8080)
     tornado.ioloop.IOLoop.instance().start()
