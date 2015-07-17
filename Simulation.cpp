@@ -1,13 +1,4 @@
 #include "Simulation.h"
-#include "Vector.h"
-#include "Scene.h"
-#include "PathFinder.h"
-#include "Flocking.h"
-#include <iostream>
-#include <fstream>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include "fish-sim.pb.h"
 
 using namespace math;
 
@@ -64,12 +55,7 @@ Simulation::loadScene()
 bool
 Simulation::frame()
 {
-	std::fstream fd;
-	const char* myfifo = "/tmp/myfifo";
 
-	/* create the FIFO (named pipe) */
-	mkfifo(myfifo, 0666);
-	fd.open(myfifo);
 	Flock flock(math::Vec2i(0, 0), math::Vec2i(X_MAX, Y_MAX), true, false);
 	math::Vec2d location(math::randomRange(0, X_MAX),
 	        			 math::randomRange(0, Y_MAX));
@@ -102,8 +88,6 @@ Simulation::frame()
     		fish.set_orient_y(0);
     		fish.set_orient_z(0);
     		fish.SerializeToOstream(&fd);
-    		fd.close();
-
     	}
     }
 
@@ -118,15 +102,36 @@ Simulation::onFrameStart()
 void
 Simulation::onFrameEnd()
 {
+
 }
+
+
+void
+Simulation::openPipe()
+{
+	const char* myfifo = "/tmp/myfifo";
+	/* create the FIFO (named pipe) */
+	mkfifo(myfifo, 0666);
+	fd.open(myfifo);
+}
+
+
+void
+Simulation::closePipe()
+{
+	fd.close();
+}
+
 
 void
 Simulation::init()
 {
 	PathFinder pathFinder;
 	mPath = pathFinder.getPath(mScene);
-
+	openPipe();
 }
+
+
 
 void
 Simulation::run()
@@ -137,7 +142,9 @@ Simulation::run()
 		continueRunning = frame();
 		onFrameEnd();
 	}
+	closePipe();
 }
+
 
 double
 Simulation::totalTime()
