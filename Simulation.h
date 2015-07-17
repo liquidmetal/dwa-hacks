@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include "fish-sim.pb.h"
+#include "MapLoader.h"
 using namespace math;
 
 class Simulation
