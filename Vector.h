@@ -5,12 +5,10 @@
 
 namespace math {
 
-template <class T>    
-inline T randomRange(T minValue, T maxValue)
+inline int randomRange(int minValue, int maxValue)
 {
-    return minValue + (rand() % (T)(maxValue - minValue + 1));
+    return minValue + (rand() % (maxValue - minValue + 1));
 }
-
 template <class T>
 class Vec2 {
 public:

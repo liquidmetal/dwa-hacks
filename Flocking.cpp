@@ -189,7 +189,7 @@ void Boid::drift()
     double radius = 30.0;
     double diameter = 60.0;
     int driftBounds = 45;
-    driftAngle += randomRange<int>(-driftBounds, driftBounds);
+    driftAngle += randomRange(-driftBounds, driftBounds);
 
     Vec2d center = velocity;
     center.normalize();
