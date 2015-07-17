@@ -67,7 +67,7 @@ class SimHandler(tornado.websocket.WebSocketHandler):
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        fp = open("./static/index.html")
+        fp = open("./index.html")
         self.write(fp.read())
         fp.close()
 
