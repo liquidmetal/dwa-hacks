@@ -15,15 +15,16 @@ class Simulation
 {
 public:
 	void loadScene(char* mapFile);
-	void init();
+	void init(char* pipeFile);
 	void onFrameStart();
 	void onFrameEnd();
 	bool frame();
 	void run();
-	void openPipe();
-	void closePipe();
 	double totalTime();
 private:
+	void openPipe(char* pipeFile);
+	void closePipe();
+
 	Scene* mScene;
 	std::vector<Vec2d> mPath;
 	std::fstream fd;

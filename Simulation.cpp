@@ -92,12 +92,11 @@ Simulation::onFrameEnd()
 
 
 void
-Simulation::openPipe()
+Simulation::openPipe(char* pipeFile)
 {
-	const char* myfifo = "/tmp/myfifo";
 	/* create the FIFO (named pipe) */
-	mkfifo(myfifo, 0666);
-	fd.open(myfifo);
+	mkfifo(pipeFile, 0666);
+	fd.open(pipeFile);
 }
 
 
@@ -109,11 +108,11 @@ Simulation::closePipe()
 
 
 void
-Simulation::init()
+Simulation::init(char* pipeFile)
 {
 	PathFinder pathFinder;
 	mPath = pathFinder.getPath(mScene);
-	openPipe();
+	openPipe(pipeFile);
 }
 
 
