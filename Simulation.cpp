@@ -3,6 +3,11 @@
 #include "Scene.h"
 #include "PathFinder.h"
 #include "Flocking.h"
+#include <iostream>
+#include <fstream>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include "fish-sim.pb.h"
 
 using namespace math;
 
@@ -10,6 +15,8 @@ const bool T = true;
 const bool F = false;
 const unsigned int X_MAX = 50;
 const unsigned int Y_MAX = 25;
+
+
 
 void
 Simulation::loadScene()
@@ -57,6 +64,12 @@ Simulation::loadScene()
 bool
 Simulation::frame()
 {
+	std::fstream fd;
+	const char* myfifo = "/tmp/myfifo";
+
+	/* create the FIFO (named pipe) */
+	mkfifo(myfifo, 0666);
+	fd.open(myfifo);
 	Flock flock(math::Vec2i(0, 0), math::Vec2i(X_MAX, Y_MAX), true, false);
 	math::Vec2d location(math::randomRange(0, X_MAX),
 	        			 math::randomRange(0, Y_MAX));
@@ -73,6 +86,7 @@ Simulation::frame()
          );
         }
 
+    FishSim fish;
     for (Vec2d point : mPath) {
     	flock.run();
     	flock.seek(point);
@@ -81,6 +95,14 @@ Simulation::frame()
     	for(int i = 0; i < boids.size(); ++i){
     		math::Vec2d location = boids[i]->getLocation();
     		std::cout << "Boid :" << i << ": X :"<< location.x << " Y : " << location.y << std::endl;
+    		fish.set_pos_x(location.x);
+    		fish.set_pos_y(location.y);
+    		fish.set_pos_z(0);
+    		fish.set_orient_x(0);
+    		fish.set_orient_y(0);
+    		fish.set_orient_z(0);
+    		fish.SerializeToOstream(&fd);
+    		fd.close();
 
     	}
     }
