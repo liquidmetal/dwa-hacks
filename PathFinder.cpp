@@ -9,11 +9,13 @@ PathFinder::getPath(Scene* scene)
 	int startY = (int)mScene->getStartPosition().y;
 	int startId = startY * mScene->getGrid().getMaxX() + startX;
 	mStartNode = new SearchNode(startX, startY, startId);
+	
 
 	int endX = (int)mScene->getEndPosition().x;
 	int endY = (int)mScene->getEndPosition().y;
-	int endId = endX * mScene->getGrid().getMaxX() + endX;
+	int endId = endY * mScene->getGrid().getMaxX() + endX;
 	mEndNode = new SearchNode(endX, endY, endId);
+	mStartNode->calculateHeuristicCost(mEndNode);
 
 	mOpenList.push_back(mStartNode);
 
@@ -43,13 +45,13 @@ PathFinder::getNextNode()
 			nodeIndex = i;
 		}
 		i++;
+	}
 
-		if (nodeIndex >= 0)
-		{
-			nextNode = mOpenList[nodeIndex];
-			mClosedList.push_back(nextNode);
-			mOpenList.erase(mOpenList.begin() + nodeIndex);
-		}
+	if (nodeIndex >= 0)
+	{
+		nextNode = mOpenList[nodeIndex];
+		mClosedList.push_back(nextNode);
+		mOpenList.erase(mOpenList.begin() + nodeIndex);
 	}
 
 	return nextNode;
@@ -64,17 +66,28 @@ PathFinder::searchNode(unsigned int x,unsigned int y, double movementCost, Searc
 	}
 
 	int id = y * mScene->getGrid().getMaxX() + x;
-	for (SearchNode* node : mClosedList)
-	{
-		if (id == node->id)
-		{
-			return;
-		}
-	}
-
 	SearchNode* newNode = new SearchNode(x, y, id, parent);
 	newNode->calculateHeuristicCost(mEndNode);
 	newNode->movementCost = movementCost;
+
+	auto iter = mClosedList.begin();
+	while (iter != mClosedList.end())
+	{
+		SearchNode* node = (*iter);
+		if (node->id == newNode->id) {
+			if (node->getExpectedCost() > newNode->getExpectedCost())
+			{
+				mClosedList.erase(iter);
+				break;
+			}
+			else
+			{
+				delete newNode;
+				return;
+			}
+		}
+		++iter;
+	}
 
 	for (SearchNode* node : mOpenList)
 	{
@@ -83,7 +96,8 @@ PathFinder::searchNode(unsigned int x,unsigned int y, double movementCost, Searc
 			if (node->getExpectedCost() > newNode->getExpectedCost())
 			{
 				node->movementCost = newNode->movementCost;
-				node->parent = newNode;
+				node->parent = parent;
+				return;
 			}
 			else
 			{
@@ -99,40 +113,48 @@ PathFinder::searchNode(unsigned int x,unsigned int y, double movementCost, Searc
 void
 PathFinder::searchPath()
 {
-	if (mOpenList.empty())
-	{
-		return;
-	}
-
-	SearchNode* node = getNextNode();
-	if (node->id == mEndNode->id)
-	{
-		std::vector<Vec2d> inversePath;
-		while (node != nullptr) 
+	while (!mOpenList.empty()) {
+		SearchNode* node = getNextNode();
+		if (node->id == mEndNode->id)
 		{
-			inversePath.push_back(Vec2d(node->x, node->y));
-		}
+			std::vector<Vec2d> inversePath;
+			while (node != nullptr)
+			{
+				inversePath.push_back(Vec2d(node->x, node->y));
+				node = node->parent;
+			}
 
-		mPath.assign(inversePath.rbegin(), inversePath.rend());
-	}
-	else {
-		searchNode(node->x + 1, node->y, node->movementCost + 1, node);
-		searchNode(node->x - 1, node->y, node->movementCost + 1, node);
-		searchNode(node->x, node->y + 1, node->movementCost + 1, node);
-		searchNode(node->x, node->y - 1, node->movementCost + 1, node);
-		searchNode(node->x + 1, node->y + 1, node->movementCost + 1.414, node);
-		searchNode(node->x - 1, node->y + 1, node->movementCost + 1.414, node);
-		searchNode(node->x + 1, node->y - 1, node->movementCost + 1.414, node);
-		searchNode(node->x - 1, node->y - 1, node->movementCost + 1.414, node);
+			mPath.assign(inversePath.rbegin(), inversePath.rend());
+			mFoundPath = true;
+			break;
+		}
+		else {
+			int maxX = mScene->getGrid().getMaxX() - 1;
+			int maxY = mScene->getGrid().getMaxY() - 1;
+			
+			if (node->x < maxX)
+				searchNode(node->x + 1, node->y, node->movementCost + 1, node);
+			if (node->x > 0)
+				searchNode(node->x - 1, node->y, node->movementCost + 1, node);
+			if (node->y < maxY)
+				searchNode(node->x, node->y + 1, node->movementCost + 1, node);
+			if (node->y > 0)
+				searchNode(node->x, node->y - 1, node->movementCost + 1, node);
+			if (node->x < maxX && node->y < maxY)
+				searchNode(node->x + 1, node->y + 1, node->movementCost + 1.414, node);
+			if (node->x > 0 && node->y < maxY)
+				searchNode(node->x - 1, node->y + 1, node->movementCost + 1.414, node);
+			if (node->x < maxX && node->y > 0)
+				searchNode(node->x + 1, node->y - 1, node->movementCost + 1.414, node);
+			if (node->x > 0 && node->y > 0)
+				searchNode(node->x - 1, node->y - 1, node->movementCost + 1.414, node);
+		}
 	}
 }
 
 void
 PathFinder::cleanup()
 {
-	delete mEndNode;
-	delete mStartNode;
-
 	for (SearchNode* node : mOpenList)
 	{
 		delete node;

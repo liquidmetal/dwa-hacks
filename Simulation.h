@@ -1,5 +1,7 @@
 #pragma once
 #include "Scene.h"
+#include <vector>
+using namespace math;
 
 class Simulation
 {
@@ -13,4 +15,5 @@ public:
 	double totalTime();
 private:
 	Scene* mScene;
+	std::vector<Vec2d> mPath;
 };
