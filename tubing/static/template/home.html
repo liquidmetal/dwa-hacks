@@ -1,0 +1,35 @@
+<div class='row'>
+    <div class='col-md-offset-1 col-md-10'>
+        <div class='panel panel-default'>
+            <div class='panel-heading'>Step 1: Pick a map</div>
+            <div class='panel-body'>
+                <div class='row'>
+                    <div class='col-md-3'>
+                        <div class='btn-group-vertical full-width' role='group'>
+                            <button ng-class='{"btn-primary": ui_is_current_map_selected(map), "btn-default": !ui_is_current_map_selected(map)}'
+                                    ng-repeat='map in default_maps'
+                                    ng-click='ui_select_map(map)'
+                                    class='btn btn-default'>
+                                        {{map.name}}
+                            </button>
+                            <button class='btn btn-default btn-block'
+                                ng-click='ui_select_map("custom")'
+                                ng-class='{"btn-primary": ui_is_custom_selected(), "btn-default": !ui_is_custom_selected()}'
+                                >
+                                Upload custom map
+                            </button>
+                        </div>
+                    </div>
+                    <div class='col-md-9'>
+                        <div ng-if='ui_is_custom_selected()'>
+                            <form>
+                                Choose a file to upload:
+                                <button ngf-select ng-model='custom.file'>Choose map</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

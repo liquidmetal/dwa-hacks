@@ -11,6 +11,8 @@ import tornado.web
 import tornado.websocket
 import tornado.ioloop
 
+import simplejson
+
 from codecs import utf_8_encode
 
 class SimHandler(tornado.websocket.WebSocketHandler):
@@ -42,22 +44,19 @@ class SimHandler(tornado.websocket.WebSocketHandler):
             fish = fish_sim_pb2.FishSim()
             fish.ParseFromString(buff)
 
-            fish_to_send = fish_gl_pb2.FishGL()
-            fish_to_send.pos_x = fish.pos_x
-            fish_to_send.pos_y = fish.pos_y
-            fish_to_send.pos_z = fish.pos_z
-            fish_to_send.orient_x = fish.orient_x
-            fish_to_send.orient_y = fish.orient_y
-            fish_to_send.orient_z = fish.orient_z
-            buff_to_send = fish_to_send.SerializeToString()
-            buff_to_send_size = chr(len(buff_to_send))
+            to_send = {}
+            to_send['pos_x'] = fish.pos_x
+            to_send['pos_y'] = fish.pos_y
+            to_send['pos_z'] = fish.pos_z
+            to_send['orient_x'] = fish.orient_x
+            to_send['orient_y'] = fish.orient_y
+            to_send['orient_z'] = fish.orient_z
 
-            self.write_message(buff_to_send_size)
-            self.write_message(buff_to_send)
+            self.write_message(simplejson.dumps(to_send))
 
             self.message_counter += 1
             if self.message_counter % 1000 == 0:
-                print(message_counter)
+                print(self.message_counter)
         elif message == "A":
             # Acknowledged
             return
@@ -68,7 +67,7 @@ class SimHandler(tornado.websocket.WebSocketHandler):
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        fp = open("./static/index.html")
+        fp = open("./index.html")
         self.write(fp.read())
         fp.close()
 

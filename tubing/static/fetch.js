@@ -6,9 +6,11 @@ socket.onopen = function() {
 }
 
 socket.onmessage = function(msg) {
+    parsed_message = JSON.parse(msg.data)
+
     counter += 1;
-    console.log(counter)
     if(counter % 1000 == 0) {
         console.log(msg)
     }
+    socket.send("RA")
 }
