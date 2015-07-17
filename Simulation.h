@@ -14,7 +14,7 @@ using namespace math;
 class Simulation
 {
 public:
-	void loadScene();
+	void loadScene(char* mapFile);
 	void init();
 	void onFrameStart();
 	void onFrameEnd();

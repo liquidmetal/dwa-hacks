@@ -8,10 +8,10 @@ unsigned int X_MAX = 50;
 unsigned int Y_MAX = 25;
 
 void
-Simulation::loadScene()
+Simulation::loadScene(char* mapFile)
 {
     MapLoader ml;
-    bool **data = ml.loadMap("./maps/simple01.map");
+    bool **data = ml.loadMap(mapFile);
 	const Vec2d startPosition = ml.getStartPosition();
 	const Vec2d endPosition = ml.getEndPosition();
     X_MAX = ml.getNumCols();
