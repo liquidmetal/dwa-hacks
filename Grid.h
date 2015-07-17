@@ -34,7 +34,7 @@ public:
 	Grid(const Grid& grid) 
 	{
 		mMaxX = grid.mMaxX;
-		mMaxX = grid.mMaxY;
+		mMaxY = grid.mMaxY;
 		mData = new T[mMaxY * mMaxX];
 		memcpy(mData, grid.mData, sizeof(T) * mMaxX * mMaxY);
 	}

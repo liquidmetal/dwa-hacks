@@ -1,6 +1,7 @@
 #include "Simulation.h"
 #include "Vector.h"
 #include "Scene.h"
+#include "PathFinder.h"
 
 using namespace math;
 
@@ -70,6 +71,13 @@ Simulation::onFrameEnd()
 void
 Simulation::init()
 {
+	PathFinder pathFinder;
+	mPath = pathFinder.getPath(mScene);
+
+	for (Vec2d point : mPath)
+	{
+		std::cout << "X :" << point.x << " Y : " << point.y << std::endl;
+	}
 }
 
 void
