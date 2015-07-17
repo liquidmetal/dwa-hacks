@@ -11,7 +11,7 @@ import tornado.web
 import tornado.websocket
 import tornado.ioloop
 
-import simplejson
+import simplejson, tempfile
 
 from codecs import utf_8_encode
 
@@ -20,17 +20,21 @@ MAP_PATH = '/tmp/maps'
 class SimHandler(tornado.websocket.WebSocketHandler):
     """
     """
-    def open(self):
-        filename = "/tmp/fish-pipe"
+    def _open_pipe(self):
         try:
-            os.mkfifo(filename, 0700)
+            os.mkfifo(self.filename, 0700)
         except OSError, e:
             print("The file probably already exists")
             pass
 
-        self.fp = os.open(filename, os.O_RDONLY)
+        self.fp = os.open(self.filename, os.O_RDONLY)
         self.message_counter = 0
+        return
+
+    def open(self):
         print("WebSocket opened")
+        tmpdir = tempfile.mkdtemp()
+        self.filename = os.path.join(tmpdir, 'fish-pipe')
         return
 
     def on_message(self, message):
@@ -62,6 +66,14 @@ class SimHandler(tornado.websocket.WebSocketHandler):
         elif message == "A":
             # Acknowledged
             return
+        elif message.startswith('S'):
+            # Start the simulator
+            map_file = message.split(':')[1]
+            cmd = "../flock-solve %s/%s %s" % (MAP_PATH, map_file, self.filename)
+            os.spawnl(os.P_NOWAIT, cmd)
+            print("spanwed command: %s" % cmd)
+            self._open_pipe()
+            print("Connected to pipe")
 
     def close(self):
         os.close(self.fp)
