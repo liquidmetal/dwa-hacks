@@ -98,7 +98,6 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
                         }
 
                         if(map_block_type=='#') {
-                            $log.info("Found an objstacle");
                             scope.generate_obstacle_rect(scope.obstacle_tile_size, x, y);
                         }
                     }
