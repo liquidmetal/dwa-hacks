@@ -1,5 +1,5 @@
-angular.module('fishApp').controller('SimulationCtrl', ['$scope', '$log', '$routeParams', 'Maps',
-    function($scope, $log, $routeParams, Maps) {
+angular.module('fishApp').controller('SimulationCtrl', ['$scope', '$log', '$routeParams', '$location', 'Maps',
+    function($scope, $log, $routeParams, $location, Maps) {
         $scope._load_map = function() {
             Maps.fetch_map_data($scope.map_name, $scope._map_load_success, $scope._map_load_fail);
         }
@@ -15,6 +15,10 @@ angular.module('fishApp').controller('SimulationCtrl', ['$scope', '$log', '$rout
             $scope.map_name = $routeParams.mapname;
 
             $scope._load_map()
+        }
+
+        $scope.ui_back_to_maps = function() {
+            $location.path('/');
         }
 
         $scope.initialize();
