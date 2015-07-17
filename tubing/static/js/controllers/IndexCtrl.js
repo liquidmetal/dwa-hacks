@@ -1,5 +1,5 @@
-angular.module('fishApp').controller('IndexCtrl', ['$scope', '$log', 'Maps',
-    function($scope, $log, Maps) {
+angular.module('fishApp').controller('IndexCtrl', ['$scope', '$log', '$location', 'Maps',
+    function($scope, $log, $location, Maps) {
         $scope.initialize = function() {
             Maps.fetch_maps($scope._map_fetch_successful, $scope._map_fetch_fail);
 
@@ -66,6 +66,7 @@ angular.module('fishApp').controller('IndexCtrl', ['$scope', '$log', 'Maps',
 
         $scope.ui_run_simulation = function() {
             $log.info("Running simulation!");
+            $location.path('/simulate/' + $scope.selected_map.name);
             return
         }
 
