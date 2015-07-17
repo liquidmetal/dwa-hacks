@@ -1,12 +1,39 @@
 angular.module('fishApp').controller('IndexCtrl', ['$scope', '$log', 'Maps',
     function($scope, $log, Maps) {
         $scope.initialize = function() {
-            $scope.default_maps = Maps.fetch_default_maps();
-            $scope.selected_map = "custom";
+            Maps.fetch_maps($scope._map_fetch_successful, $scope._map_fetch_fail);
 
+            $scope.default_maps = [];
+            $scope.selected_map = "custom";
             $scope.custom = {}
             $scope.custom.file = [];
             return;
+        }
+
+        $scope._map_fetch_successful = function(data, status, headers, config) {
+            $scope.default_maps = data.maps;
+            $log.info("Fetched " + data.map_count + " pre-existing maps");
+            return;
+        }
+
+        $scope._map_fetch_successful_switch = function(data, status, headers, config) {
+            // Update the default_maps thing
+            $scope._map_fetch_successful(data, status, headers, config);
+
+            // Switch to the map just uploaded
+            var mapname = $scope.custom.file[0].name;
+            var i=0;
+            for(i=0;i<$scope.default_maps.length;i++) {
+                if($scope.default_maps[i].name == mapname) {
+                    $scope.selected_map = $scope.default_maps[i];
+                    break;
+                }
+            }
+        }
+
+        $scope._map_fetch_fail = function(data, status, headers, config) {
+            $log.error("Fetching of map list failed");
+            return
         }
 
         // ui_* functions are used in the template
@@ -29,6 +56,7 @@ angular.module('fishApp').controller('IndexCtrl', ['$scope', '$log', 'Maps',
 
         $scope.ui_map_upload_success = function(data, status, headers, config) {
             $log.info("The map upload was successful!");
+            Maps.fetch_maps($scope._map_fetch_successful_switch, $scope._map_fetch_fail);
             return
         }
 

@@ -21,6 +21,22 @@
                         </div>
                     </div>
                     <div class='col-md-9'>
+                        <div ng-if='!ui_is_custom_selected()'>
+                            <table>
+                                <tr>
+                                    <td>Name: </td>
+                                    <td>{{selected_map.name}}</td>
+                                </tr>
+                                    <td>Width: </td>
+                                    <td>{{selected_map.width}}</td>
+                                <tr>
+                                </tr>
+                                <tr>
+                                    <td>Height: </td>
+                                    <td>{{selected_map.height}}</td>
+                                </tr>
+                            </table>
+                        </div>
                         <div ng-if='ui_is_custom_selected()'>
                             <form>
                                 Choose a file to upload:

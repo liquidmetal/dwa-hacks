@@ -1,12 +1,18 @@
-angular.module('fishApp').factory('Maps', ['$log', 'Upload',
-    function($log, Upload) {
+angular.module('fishApp').factory('Maps', ['$log', '$http', 'Upload', 
+    function($log, $http, Upload) {
         var map = {};
-        map.fetch_default_maps = function() {
-            return [
-                {name: 'aztec'},
-                {name: 'michi'},
-                {name: 'heaven'},
-            ]
+        map.fetch_maps = function(success, fail) {
+            $http.get('/map_list').success(function(data, status, headers, config) {
+                $log.info("Map list fetched successfull!");
+                if(success && typeof success === 'function') {
+                    success(data, status, headers, config);
+                }
+            }).error(function(data, status, headers, config) {
+                $log.info("Map list fetching failed!");
+                if(fail && typeof fail === 'function') {
+                    fail(data, status, headers, config);
+                }
+            })
         }
 
         map.upload_map = function(file, success, fail) {
