@@ -64,6 +64,11 @@ angular.module('fishApp').controller('IndexCtrl', ['$scope', '$log', 'Maps',
             $log.info("The map upload failed miserably");
         }
 
+        $scope.ui_run_simulation = function() {
+            $log.info("Running simulation!");
+            return
+        }
+
         // All watches on elements go here
         $scope.$watch('custom', function(newfile) {
             if(!newfile || !newfile.file || newfile.file.length == 0) {
