@@ -108,6 +108,27 @@ class MapListHandler(tornado.web.RequestHandler):
         self.write(simplejson.dumps(ret))
         return
 
+class MapFetchHandler(tornado.web.RequestHandler):
+    def get(self):
+        map_name = self.get_argument('name')
+
+        ret = {}
+        map_data = []
+
+        map_filepath = '%s/%s' % (MAP_PATH, map_name)
+        if not os.path.exists(map_filepath):
+            # The file doesn't exist
+            self.set_status(404)
+            return
+
+        with open('%s/%s' % (MAP_PATH, map_name), 'r') as fp:
+            map_data = [line.strip() for line in fp]
+
+        ret['map'] = map_data
+        ret['yoyo'] = 1
+        self.set_header('Content-Type', 'application/json')
+        self.write(simplejson.dumps(ret))
+        return
                 
 
 def start_server():
@@ -117,6 +138,7 @@ def start_server():
               (r"/sim", SimHandler),
               (r"/map_list", MapListHandler),
               (r"/upload_map", MapUploadHandler),
+              (r'/fetch_map', MapFetchHandler),
               (r"/static/(.*)", tornado.web.StaticFileHandler, {"path": "./static/"}),
              ]
 
