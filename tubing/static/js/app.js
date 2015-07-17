@@ -1,4 +1,4 @@
-angular.module("fishApp", ['ngRoute']).config(['$routeProvider', 
+angular.module("fishApp", ['ngRoute', 'ngFileUpload']).config(['$routeProvider',
     function($routeProvider) {
         $routeProvider.when('/', {
             templateUrl: '/static/template/home.html',

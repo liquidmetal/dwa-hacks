@@ -22,7 +22,10 @@
                     </div>
                     <div class='col-md-9'>
                         <div ng-if='ui_is_custom_selected()'>
-                            Upload something
+                            <form>
+                                Choose a file to upload:
+                                <button ngf-select ng-model='custom.file'>Choose map</button>
+                            </form>
                         </div>
                     </div>
                 </div>
