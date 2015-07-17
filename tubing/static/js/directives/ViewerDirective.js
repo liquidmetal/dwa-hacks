@@ -127,16 +127,16 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
                 scope._setup_window_size();
 
                 // Create a camera
-                scope.camera = new THREE.OrthographicCamera( -scope.window_width,     // left
+                scope.camera = new THREE.OrthographicCamera( 0,     // left
                                                              scope.window_width,      // right
-                                                             -scope.window_height ,      // top
+                                                             0,      // top
                                                              scope.window_height ,   // bottom
                                                              -500,                        // near
                                                              1000 );                      // far
 
                 // Position the camera
                 //scope.camera.position.set( scope.window_width/2, scope.window_height/2, 500);
-                scope.camera.position.set( scope.window_width, scope.window_height, 1000);
+                scope.camera.position.set( 0, 0, 1000);
 
                 scope.scene = new THREE.Scene();
                 scope.group = new THREE.Group();
