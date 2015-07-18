@@ -95,8 +95,8 @@ void
 Simulation::openPipe(char* pipeFile)
 {
 	/* create the FIFO (named pipe) */
-	mkfifo(pipeFile, 0666);
-	fd.open(pipeFile);
+	mkfifo(pipeFile, 0700);
+	fd.open(pipeFile, std::fstream::out);
 }
 
 
