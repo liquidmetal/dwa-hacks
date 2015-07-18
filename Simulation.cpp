@@ -70,8 +70,12 @@ Simulation::frame()
     		fish.set_pos_x(location.x);
     		fish.set_pos_y(location.y);
             char sz = fish.ByteSize();
-            fd.write(&sz, sizeof(char));
-    		fish.SerializeToOstream(&fd);
+
+            // Write to the pipe only if it was passed originally
+            if(bWriteToPipe) {
+                fd.write(&sz, sizeof(char));
+                fish.SerializeToOstream(&fd);
+            }
     	}
     }
 
@@ -93,16 +97,26 @@ Simulation::onFrameEnd()
 void
 Simulation::openPipe(char* pipeFile)
 {
+    if(pipeFile == nullptr) {
+        // Don't open the pipe if the pipe file arg wasn't passed
+        // Useful when debugging
+        bWriteToPipe = false;
+        return;
+    }
+
 	/* create the FIFO (named pipe) */
 	mkfifo(pipeFile, 0700);
 	fd.open(pipeFile, std::fstream::out);
+    bWriteToPipe = true;
 }
 
 
 void
 Simulation::closePipe()
 {
-	fd.close();
+    if(bWriteToPipe) {
+        fd.close();
+    }
 }
 
 

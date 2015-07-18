@@ -24,6 +24,7 @@ public:
 private:
 	void openPipe(char* pipeFile);
 	void closePipe();
+    bool bWriteToPipe = false;
 
 	Scene* mScene;
 	std::vector<Vec2d> mPath;
