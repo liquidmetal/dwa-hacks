@@ -32,13 +32,10 @@ void protobuf_AssignDesc_fish_2dsim_2eproto() {
       "fish-sim.proto");
   GOOGLE_CHECK(file != NULL);
   FishSim_descriptor_ = file->message_type(0);
-  static const int FishSim_offsets_[6] = {
+  static const int FishSim_offsets_[3] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FishSim, fish_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FishSim, pos_x_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FishSim, pos_y_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FishSim, pos_z_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FishSim, orient_x_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FishSim, orient_y_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FishSim, orient_z_),
   };
   FishSim_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -81,10 +78,8 @@ void protobuf_AddDesc_fish_2dsim_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\016fish-sim.proto\"l\n\007FishSim\022\r\n\005pos_x\030\001 \002"
-    "(\002\022\r\n\005pos_y\030\002 \002(\002\022\r\n\005pos_z\030\003 \002(\002\022\020\n\010orie"
-    "nt_x\030\004 \002(\002\022\020\n\010orient_y\030\005 \002(\002\022\020\n\010orient_z"
-    "\030\006 \002(\002", 126);
+    "\n\016fish-sim.proto\"8\n\007FishSim\022\017\n\007fish_id\030\001"
+    " \002(\005\022\r\n\005pos_x\030\002 \002(\002\022\r\n\005pos_y\030\003 \002(\002", 74);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "fish-sim.proto", &protobuf_RegisterTypes);
   FishSim::default_instance_ = new FishSim();
@@ -102,12 +97,9 @@ struct StaticDescriptorInitializer_fish_2dsim_2eproto {
 // ===================================================================
 
 #ifndef _MSC_VER
+const int FishSim::kFishIdFieldNumber;
 const int FishSim::kPosXFieldNumber;
 const int FishSim::kPosYFieldNumber;
-const int FishSim::kPosZFieldNumber;
-const int FishSim::kOrientXFieldNumber;
-const int FishSim::kOrientYFieldNumber;
-const int FishSim::kOrientZFieldNumber;
 #endif  // !_MSC_VER
 
 FishSim::FishSim()
@@ -126,12 +118,9 @@ FishSim::FishSim(const FishSim& from)
 
 void FishSim::SharedCtor() {
   _cached_size_ = 0;
+  fish_id_ = 0;
   pos_x_ = 0;
   pos_y_ = 0;
-  pos_z_ = 0;
-  orient_x_ = 0;
-  orient_y_ = 0;
-  orient_z_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -167,12 +156,9 @@ FishSim* FishSim::New() const {
 
 void FishSim::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    fish_id_ = 0;
     pos_x_ = 0;
     pos_y_ = 0;
-    pos_z_ = 0;
-    orient_x_ = 0;
-    orient_y_ = 0;
-    orient_z_ = 0;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -184,10 +170,26 @@ bool FishSim::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // required float pos_x = 1;
+      // required int32 fish_id = 1;
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &fish_id_)));
+          set_has_fish_id();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(21)) goto parse_pos_x;
+        break;
+      }
+
+      // required float pos_x = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_pos_x:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, &pos_x_)));
@@ -195,12 +197,12 @@ bool FishSim::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(21)) goto parse_pos_y;
+        if (input->ExpectTag(29)) goto parse_pos_y;
         break;
       }
 
-      // required float pos_y = 2;
-      case 2: {
+      // required float pos_y = 3;
+      case 3: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
          parse_pos_y:
@@ -208,70 +210,6 @@ bool FishSim::MergePartialFromCodedStream(
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, &pos_y_)));
           set_has_pos_y();
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectTag(29)) goto parse_pos_z;
-        break;
-      }
-
-      // required float pos_z = 3;
-      case 3: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
-         parse_pos_z:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
-                 input, &pos_z_)));
-          set_has_pos_z();
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectTag(37)) goto parse_orient_x;
-        break;
-      }
-
-      // required float orient_x = 4;
-      case 4: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
-         parse_orient_x:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
-                 input, &orient_x_)));
-          set_has_orient_x();
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectTag(45)) goto parse_orient_y;
-        break;
-      }
-
-      // required float orient_y = 5;
-      case 5: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
-         parse_orient_y:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
-                 input, &orient_y_)));
-          set_has_orient_y();
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectTag(53)) goto parse_orient_z;
-        break;
-      }
-
-      // required float orient_z = 6;
-      case 6: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
-         parse_orient_z:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
-                 input, &orient_z_)));
-          set_has_orient_z();
         } else {
           goto handle_uninterpreted;
         }
@@ -297,34 +235,19 @@ bool FishSim::MergePartialFromCodedStream(
 
 void FishSim::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // required float pos_x = 1;
+  // required int32 fish_id = 1;
+  if (has_fish_id()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->fish_id(), output);
+  }
+
+  // required float pos_x = 2;
   if (has_pos_x()) {
-    ::google::protobuf::internal::WireFormatLite::WriteFloat(1, this->pos_x(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(2, this->pos_x(), output);
   }
 
-  // required float pos_y = 2;
+  // required float pos_y = 3;
   if (has_pos_y()) {
-    ::google::protobuf::internal::WireFormatLite::WriteFloat(2, this->pos_y(), output);
-  }
-
-  // required float pos_z = 3;
-  if (has_pos_z()) {
-    ::google::protobuf::internal::WireFormatLite::WriteFloat(3, this->pos_z(), output);
-  }
-
-  // required float orient_x = 4;
-  if (has_orient_x()) {
-    ::google::protobuf::internal::WireFormatLite::WriteFloat(4, this->orient_x(), output);
-  }
-
-  // required float orient_y = 5;
-  if (has_orient_y()) {
-    ::google::protobuf::internal::WireFormatLite::WriteFloat(5, this->orient_y(), output);
-  }
-
-  // required float orient_z = 6;
-  if (has_orient_z()) {
-    ::google::protobuf::internal::WireFormatLite::WriteFloat(6, this->orient_z(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(3, this->pos_y(), output);
   }
 
   if (!unknown_fields().empty()) {
@@ -335,34 +258,19 @@ void FishSim::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* FishSim::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // required float pos_x = 1;
+  // required int32 fish_id = 1;
+  if (has_fish_id()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->fish_id(), target);
+  }
+
+  // required float pos_x = 2;
   if (has_pos_x()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(1, this->pos_x(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(2, this->pos_x(), target);
   }
 
-  // required float pos_y = 2;
+  // required float pos_y = 3;
   if (has_pos_y()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(2, this->pos_y(), target);
-  }
-
-  // required float pos_z = 3;
-  if (has_pos_z()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(3, this->pos_z(), target);
-  }
-
-  // required float orient_x = 4;
-  if (has_orient_x()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(4, this->orient_x(), target);
-  }
-
-  // required float orient_y = 5;
-  if (has_orient_y()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(5, this->orient_y(), target);
-  }
-
-  // required float orient_z = 6;
-  if (has_orient_z()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(6, this->orient_z(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(3, this->pos_y(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -376,33 +284,20 @@ int FishSim::ByteSize() const {
   int total_size = 0;
 
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // required float pos_x = 1;
+    // required int32 fish_id = 1;
+    if (has_fish_id()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->fish_id());
+    }
+
+    // required float pos_x = 2;
     if (has_pos_x()) {
       total_size += 1 + 4;
     }
 
-    // required float pos_y = 2;
+    // required float pos_y = 3;
     if (has_pos_y()) {
-      total_size += 1 + 4;
-    }
-
-    // required float pos_z = 3;
-    if (has_pos_z()) {
-      total_size += 1 + 4;
-    }
-
-    // required float orient_x = 4;
-    if (has_orient_x()) {
-      total_size += 1 + 4;
-    }
-
-    // required float orient_y = 5;
-    if (has_orient_y()) {
-      total_size += 1 + 4;
-    }
-
-    // required float orient_z = 6;
-    if (has_orient_z()) {
       total_size += 1 + 4;
     }
 
@@ -433,23 +328,14 @@ void FishSim::MergeFrom(const ::google::protobuf::Message& from) {
 void FishSim::MergeFrom(const FishSim& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_fish_id()) {
+      set_fish_id(from.fish_id());
+    }
     if (from.has_pos_x()) {
       set_pos_x(from.pos_x());
     }
     if (from.has_pos_y()) {
       set_pos_y(from.pos_y());
-    }
-    if (from.has_pos_z()) {
-      set_pos_z(from.pos_z());
-    }
-    if (from.has_orient_x()) {
-      set_orient_x(from.orient_x());
-    }
-    if (from.has_orient_y()) {
-      set_orient_y(from.orient_y());
-    }
-    if (from.has_orient_z()) {
-      set_orient_z(from.orient_z());
     }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
@@ -468,19 +354,16 @@ void FishSim::CopyFrom(const FishSim& from) {
 }
 
 bool FishSim::IsInitialized() const {
-  if ((_has_bits_[0] & 0x0000003f) != 0x0000003f) return false;
+  if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
 
   return true;
 }
 
 void FishSim::Swap(FishSim* other) {
   if (other != this) {
+    std::swap(fish_id_, other->fish_id_);
     std::swap(pos_x_, other->pos_x_);
     std::swap(pos_y_, other->pos_y_);
-    std::swap(pos_z_, other->pos_z_);
-    std::swap(orient_x_, other->orient_x_);
-    std::swap(orient_y_, other->orient_y_);
-    std::swap(orient_z_, other->orient_z_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

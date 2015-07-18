@@ -66,12 +66,9 @@ Simulation::frame()
     	for(int i = 0; i < boids.size(); ++i){
     		math::Vec2d location = boids[i]->getLocation();
     		std::cout << "Boid :" << i << ": X :"<< location.x << " Y : " << location.y << std::endl;
+            fish.set_fish_id(i);
     		fish.set_pos_x(location.x);
     		fish.set_pos_y(location.y);
-    		fish.set_pos_z(0);
-    		fish.set_orient_x(0);
-    		fish.set_orient_y(0);
-    		fish.set_orient_z(0);
             char sz = fish.ByteSize();
             fd.write(&sz, sizeof(char));
     		fish.SerializeToOstream(&fd);

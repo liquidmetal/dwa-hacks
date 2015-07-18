@@ -63,12 +63,9 @@ class SimHandler(tornado.websocket.WebSocketHandler):
             fish.ParseFromString(buff)
 
             to_send = {}
+            to_send['fish_id'] = fish.fish_id
             to_send['pos_x'] = fish.pos_x
             to_send['pos_y'] = fish.pos_y
-            to_send['pos_z'] = fish.pos_z
-            to_send['orient_x'] = fish.orient_x
-            to_send['orient_y'] = fish.orient_y
-            to_send['orient_z'] = fish.orient_z
 
             self.write_message(simplejson.dumps(to_send))
             print("Received message")

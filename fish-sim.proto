@@ -1,8 +1,5 @@
 message FishSim {
-    required float pos_x = 1;
-    required float pos_y = 2;
-    required float pos_z = 3;
-    required float orient_x = 4;
-    required float orient_y = 5;
-    required float orient_z = 6;
+    required int32 fish_id = 1;
+    required float pos_x = 2;
+    required float pos_y = 3;
 }

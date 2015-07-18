@@ -89,74 +89,44 @@ class FishSim : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // required float pos_x = 1;
+  // required int32 fish_id = 1;
+  inline bool has_fish_id() const;
+  inline void clear_fish_id();
+  static const int kFishIdFieldNumber = 1;
+  inline ::google::protobuf::int32 fish_id() const;
+  inline void set_fish_id(::google::protobuf::int32 value);
+
+  // required float pos_x = 2;
   inline bool has_pos_x() const;
   inline void clear_pos_x();
-  static const int kPosXFieldNumber = 1;
+  static const int kPosXFieldNumber = 2;
   inline float pos_x() const;
   inline void set_pos_x(float value);
 
-  // required float pos_y = 2;
+  // required float pos_y = 3;
   inline bool has_pos_y() const;
   inline void clear_pos_y();
-  static const int kPosYFieldNumber = 2;
+  static const int kPosYFieldNumber = 3;
   inline float pos_y() const;
   inline void set_pos_y(float value);
 
-  // required float pos_z = 3;
-  inline bool has_pos_z() const;
-  inline void clear_pos_z();
-  static const int kPosZFieldNumber = 3;
-  inline float pos_z() const;
-  inline void set_pos_z(float value);
-
-  // required float orient_x = 4;
-  inline bool has_orient_x() const;
-  inline void clear_orient_x();
-  static const int kOrientXFieldNumber = 4;
-  inline float orient_x() const;
-  inline void set_orient_x(float value);
-
-  // required float orient_y = 5;
-  inline bool has_orient_y() const;
-  inline void clear_orient_y();
-  static const int kOrientYFieldNumber = 5;
-  inline float orient_y() const;
-  inline void set_orient_y(float value);
-
-  // required float orient_z = 6;
-  inline bool has_orient_z() const;
-  inline void clear_orient_z();
-  static const int kOrientZFieldNumber = 6;
-  inline float orient_z() const;
-  inline void set_orient_z(float value);
-
   // @@protoc_insertion_point(class_scope:FishSim)
  private:
+  inline void set_has_fish_id();
+  inline void clear_has_fish_id();
   inline void set_has_pos_x();
   inline void clear_has_pos_x();
   inline void set_has_pos_y();
   inline void clear_has_pos_y();
-  inline void set_has_pos_z();
-  inline void clear_has_pos_z();
-  inline void set_has_orient_x();
-  inline void clear_has_orient_x();
-  inline void set_has_orient_y();
-  inline void clear_has_orient_y();
-  inline void set_has_orient_z();
-  inline void clear_has_orient_z();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
+  ::google::protobuf::int32 fish_id_;
   float pos_x_;
   float pos_y_;
-  float pos_z_;
-  float orient_x_;
-  float orient_y_;
-  float orient_z_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
 
   friend void  protobuf_AddDesc_fish_2dsim_2eproto();
   friend void protobuf_AssignDesc_fish_2dsim_2eproto();
@@ -172,15 +142,37 @@ class FishSim : public ::google::protobuf::Message {
 
 // FishSim
 
-// required float pos_x = 1;
-inline bool FishSim::has_pos_x() const {
+// required int32 fish_id = 1;
+inline bool FishSim::has_fish_id() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void FishSim::set_has_pos_x() {
+inline void FishSim::set_has_fish_id() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void FishSim::clear_has_pos_x() {
+inline void FishSim::clear_has_fish_id() {
   _has_bits_[0] &= ~0x00000001u;
+}
+inline void FishSim::clear_fish_id() {
+  fish_id_ = 0;
+  clear_has_fish_id();
+}
+inline ::google::protobuf::int32 FishSim::fish_id() const {
+  return fish_id_;
+}
+inline void FishSim::set_fish_id(::google::protobuf::int32 value) {
+  set_has_fish_id();
+  fish_id_ = value;
+}
+
+// required float pos_x = 2;
+inline bool FishSim::has_pos_x() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void FishSim::set_has_pos_x() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void FishSim::clear_has_pos_x() {
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline void FishSim::clear_pos_x() {
   pos_x_ = 0;
@@ -194,15 +186,15 @@ inline void FishSim::set_pos_x(float value) {
   pos_x_ = value;
 }
 
-// required float pos_y = 2;
+// required float pos_y = 3;
 inline bool FishSim::has_pos_y() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
+  return (_has_bits_[0] & 0x00000004u) != 0;
 }
 inline void FishSim::set_has_pos_y() {
-  _has_bits_[0] |= 0x00000002u;
+  _has_bits_[0] |= 0x00000004u;
 }
 inline void FishSim::clear_has_pos_y() {
-  _has_bits_[0] &= ~0x00000002u;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline void FishSim::clear_pos_y() {
   pos_y_ = 0;
@@ -214,94 +206,6 @@ inline float FishSim::pos_y() const {
 inline void FishSim::set_pos_y(float value) {
   set_has_pos_y();
   pos_y_ = value;
-}
-
-// required float pos_z = 3;
-inline bool FishSim::has_pos_z() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void FishSim::set_has_pos_z() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void FishSim::clear_has_pos_z() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void FishSim::clear_pos_z() {
-  pos_z_ = 0;
-  clear_has_pos_z();
-}
-inline float FishSim::pos_z() const {
-  return pos_z_;
-}
-inline void FishSim::set_pos_z(float value) {
-  set_has_pos_z();
-  pos_z_ = value;
-}
-
-// required float orient_x = 4;
-inline bool FishSim::has_orient_x() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
-}
-inline void FishSim::set_has_orient_x() {
-  _has_bits_[0] |= 0x00000008u;
-}
-inline void FishSim::clear_has_orient_x() {
-  _has_bits_[0] &= ~0x00000008u;
-}
-inline void FishSim::clear_orient_x() {
-  orient_x_ = 0;
-  clear_has_orient_x();
-}
-inline float FishSim::orient_x() const {
-  return orient_x_;
-}
-inline void FishSim::set_orient_x(float value) {
-  set_has_orient_x();
-  orient_x_ = value;
-}
-
-// required float orient_y = 5;
-inline bool FishSim::has_orient_y() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
-}
-inline void FishSim::set_has_orient_y() {
-  _has_bits_[0] |= 0x00000010u;
-}
-inline void FishSim::clear_has_orient_y() {
-  _has_bits_[0] &= ~0x00000010u;
-}
-inline void FishSim::clear_orient_y() {
-  orient_y_ = 0;
-  clear_has_orient_y();
-}
-inline float FishSim::orient_y() const {
-  return orient_y_;
-}
-inline void FishSim::set_orient_y(float value) {
-  set_has_orient_y();
-  orient_y_ = value;
-}
-
-// required float orient_z = 6;
-inline bool FishSim::has_orient_z() const {
-  return (_has_bits_[0] & 0x00000020u) != 0;
-}
-inline void FishSim::set_has_orient_z() {
-  _has_bits_[0] |= 0x00000020u;
-}
-inline void FishSim::clear_has_orient_z() {
-  _has_bits_[0] &= ~0x00000020u;
-}
-inline void FishSim::clear_orient_z() {
-  orient_z_ = 0;
-  clear_has_orient_z();
-}
-inline float FishSim::orient_z() const {
-  return orient_z_;
-}
-inline void FishSim::set_orient_z(float value) {
-  set_has_orient_z();
-  orient_z_ = value;
 }
 
 
