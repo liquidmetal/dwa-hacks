@@ -11,7 +11,7 @@ import tornado.web
 import tornado.websocket
 import tornado.ioloop
 
-import simplejson, tempfile
+import simplejson, tempfile, subprocess
 
 from codecs import utf_8_encode
 
@@ -20,33 +20,45 @@ MAP_PATH = '/tmp/maps'
 class SimHandler(tornado.websocket.WebSocketHandler):
     """
     """
-    def _open_pipe(self):
-        try:
-            os.mkfifo(self.filename, 0700)
-        except OSError, e:
-            print("The file probably already exists")
-            pass
+    def execute(self, command):
+        popen = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+        lines_iterator = iter(popen.stdout.readline, b"")
+        for line in lines_iterator:
+            print(line)
+        return
 
-        self.fp = os.open(self.filename, os.O_RDONLY)
+    def _open_pipe(self):
+
+        self.fp = open(self.filename, 'rb')
+        #self.fp = os.open(self.filename, os.O_RDONLY, 0)
         self.message_counter = 0
         return
 
     def open(self):
-        print("WebSocket opened")
         tmpdir = tempfile.mkdtemp()
         self.filename = os.path.join(tmpdir, 'fish-pipe')
+
+        try:
+            os.mkfifo(self.filename, 0700)
+        except OSError, e:
+            print("The file probably already exists")
+
+        print("WebSocket opened")
         return
 
     def on_message(self, message):
         if message == "RA" or message == "R":
             # Request for a fish
-            buff_size = os.read(self.fp, 1)
+            buff_size = self.fp.read(1)
 
             if buff_size == "":
                 print("The stream ended")
                 return
 
-            buff = os.read(self.fp, ord(buff_size))
+            buff_size = ord(buff_size)
+
+            #buff = os.read(self.fp, ord(buff_size))
+            buff = self.fp.read(buff_size)
             fish = fish_sim_pb2.FishSim()
             fish.ParseFromString(buff)
 
@@ -59,6 +71,7 @@ class SimHandler(tornado.websocket.WebSocketHandler):
             to_send['orient_z'] = fish.orient_z
 
             self.write_message(simplejson.dumps(to_send))
+            print("Received message")
 
             self.message_counter += 1
             if self.message_counter % 1000 == 0:
@@ -69,9 +82,9 @@ class SimHandler(tornado.websocket.WebSocketHandler):
         elif message.startswith('S'):
             # Start the simulator
             map_file = message.split(':')[1]
-            cmd = "../flock-solve %s/%s %s" % (MAP_PATH, map_file, self.filename)
-            os.spawnl(os.P_NOWAIT, cmd)
-            print("spanwed command: %s" % cmd)
+            print("Trying to run command")
+            subprocess.Popen(['../flock-solve', '%s/%s' % (MAP_PATH, map_file), self.filename])
+            print("spanwed command")
             self._open_pipe()
             print("Connected to pipe")
 
