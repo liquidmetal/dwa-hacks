@@ -72,6 +72,8 @@ Simulation::frame()
     		fish.set_orient_x(0);
     		fish.set_orient_y(0);
     		fish.set_orient_z(0);
+            char sz = fish.ByteSize();
+            fd.write(&sz, sizeof(char));
     		fish.SerializeToOstream(&fd);
     	}
     }
