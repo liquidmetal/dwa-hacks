@@ -44,7 +44,7 @@ Simulation::loadScene(char* mapFile)
 }
 
 bool
-Simulation::frame()
+Simulation::frame(long long simTimeInMS)
 {
 
 	Flock flock(math::Vec2i(0, 0), math::Vec2i(X_MAX, Y_MAX), true, false);
@@ -143,10 +143,11 @@ void
 Simulation::run()
 {
 	bool continueRunning = true;
+	static long long simTime = 0;
 	while (continueRunning) {
 		auto startTime = std::chrono::steady_clock::now();
 		onFrameStart();
-		continueRunning = frame();
+		continueRunning = frame(simTime);
 		onFrameEnd();
 		auto endTime = std::chrono::steady_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
@@ -156,9 +157,11 @@ Simulation::run()
 		}
 		else if (duration > 16) {
 			continue;
+			simTime += duration;
 		}
 		else {
 			std::this_thread::sleep_for(endTime - startTime);
+			simTime += 16;
 		}
 
 	}

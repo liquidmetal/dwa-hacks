@@ -19,7 +19,7 @@ public:
 	void init(char* pipeFile);
 	void onFrameStart();
 	void onFrameEnd();
-	bool frame();
+	bool frame(long long simTimeInMS);
 	void run();
 	long long totalTime();
 private:
