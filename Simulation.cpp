@@ -1,4 +1,5 @@
 #include "Simulation.h"
+#include <thread>
 
 using namespace math;
 
@@ -7,9 +8,12 @@ const bool F = false;
 unsigned int X_MAX = 50;
 unsigned int Y_MAX = 25;
 
+
 void
 Simulation::loadScene(char* mapFile)
 {
+	auto startTime = std::chrono::steady_clock::now();
+	mStartTime = std::chrono::steady_clock::now();
     MapLoader ml;
     bool **data = ml.loadMap(mapFile);
 	const Vec2d startPosition = ml.getStartPosition();
@@ -35,6 +39,8 @@ Simulation::loadScene(char* mapFile)
 
 	Grid<bool> mapData(X_MAX, Y_MAX, passData);
 	mScene = new Scene(startPosition, endPosition, mapData);
+	auto endTime = std::chrono::steady_clock::now();
+	std::cout << "Map Loading Time (ms) : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
 }
 
 bool
@@ -45,17 +51,17 @@ Simulation::frame()
 	math::Vec2d location(math::randomRange(0, X_MAX),
 	        			 math::randomRange(0, Y_MAX));
 	for(int i = 0; i < 3; ++i)
-        {
-            flock.addBoid(location + math::Vec2d(i, 0), 
-            			  math::Vec2d(0, 0),
-                          math::Vec2d(
-                          	math::randomRange(-400, 400) / 100.0, 
-                          	math::randomRange(-5, 5) / 100.0
-                          ),                       
-                          8.0,
-                          0.1
-         );
-        }
+    {
+        flock.addBoid(location + math::Vec2d(i, 0), 
+            			math::Vec2d(0, 0),
+                        math::Vec2d(
+                        math::randomRange(-400, 400) / 100.0, 
+                        math::randomRange(-5, 5) / 100.0
+                        ),                       
+                        8.0,
+                        0.1
+        );
+    }
 
     FishSim fish;
     for (Vec2d point : mPath) {
@@ -123,9 +129,12 @@ Simulation::closePipe()
 void
 Simulation::init(char* pipeFile)
 {
+	auto startTime = std::chrono::steady_clock::now();
 	PathFinder pathFinder;
 	mPath = pathFinder.getPath(mScene);
 	openPipe(pipeFile);
+	auto endTime = std::chrono::steady_clock::now();
+	std::cout << "Init Time (ms) : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
 }
 
 
@@ -135,16 +144,31 @@ Simulation::run()
 {
 	bool continueRunning = true;
 	while (continueRunning) {
+		auto startTime = std::chrono::steady_clock::now();
 		onFrameStart();
 		continueRunning = frame();
 		onFrameEnd();
+		auto endTime = std::chrono::steady_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+		if (duration > 33) {
+			std::cout << "Exceeded maximum allocated time." << std::endl;
+			exit(1);
+		}
+		else if (duration > 16) {
+			continue;
+		}
+		else {
+			std::this_thread::sleep_for(endTime - startTime);
+		}
+
 	}
 	closePipe();
+	mEndTime = std::chrono::steady_clock::now();
 }
 
 
-double
+long long
 Simulation::totalTime()
 {
-	return 0;
+	return std::chrono::duration_cast<std::chrono::seconds>(mEndTime - mStartTime).count();
 }

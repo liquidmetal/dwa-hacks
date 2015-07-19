@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include "fish-sim.pb.h"
 #include "MapLoader.h"
+#include <chrono>
 using namespace math;
 
 class Simulation
@@ -20,7 +21,7 @@ public:
 	void onFrameEnd();
 	bool frame();
 	void run();
-	double totalTime();
+	long long totalTime();
 private:
 	void openPipe(char* pipeFile);
 	void closePipe();
@@ -29,4 +30,6 @@ private:
 	Scene* mScene;
 	std::vector<Vec2d> mPath;
 	std::fstream fd;
+	std::chrono::steady_clock::time_point mStartTime;
+	std::chrono::steady_clock::time_point mEndTime;
 };
