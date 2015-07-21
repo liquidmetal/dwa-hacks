@@ -1,4 +1,4 @@
-angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($log, $window) {
+angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', function($log, $window, Sim) {
     return {
         restrict: 'E',
         templateUrl: '/static/template/fish_viewer.html',
@@ -527,6 +527,19 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
                 scope._generate_map_scene();
                 testSimple();
             }, true);
+
+            scope.$watch(function() {
+                return Sim.get_fish_count();
+            }, function(newval, oldval) {
+                if(newval == 0) {
+                    return;
+                }
+                $log.log("New fish created: " + newval);
+                var current_frame = Sim.get_current_frame();
+                var pos = Sim.get_fish_position(current_frame, newval-1);
+                debugger
+                scope.addfish1(newval-1, 25 + pos.pos_x, 25 + pos.pos_y, 0, 0, 0.05);
+            });
 
             scope.init();
             scope.animate();
