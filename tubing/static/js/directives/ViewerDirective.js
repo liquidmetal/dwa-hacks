@@ -85,7 +85,9 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', fun
                                                                               scope.window_height);
 
                 scope.group_obstacle = new THREE.Group();
+                scope.group_fish = new THREE.Group();
                 scope.scene.add(scope.group_obstacle);
+                scope.scene.add(scope.group_fish);
 
                 scope.generate_obstacle_rect(scope.obstacle_tile_size, 0, 0);
 
