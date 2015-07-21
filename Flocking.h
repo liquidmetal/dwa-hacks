@@ -69,6 +69,7 @@ public:
 
     void run();
     void seek(math::Vec2d target);
+    void update();
     void drift();
 
     // Returns the boid id for the created boid

@@ -52,26 +52,34 @@ Simulation::frame(long long simTimeInMS)
 	        			 math::randomRange(0, Y_MAX));
 	for(int i = 0; i < 3; ++i)
     {
-        flock.addBoid(location + math::Vec2d(i, 0), 
+        flock.addBoid(math::Vec2d(0, 0), 
             			math::Vec2d(0, 0),
                         math::Vec2d(
-                        math::randomRange(-400, 400) / 100.0, 
+                        math::randomRange(-4, 4) / 100.0, 
                         math::randomRange(-5, 5) / 100.0
                         ),                       
-                        8.0,
+                        3.0,
                         0.1
         );
     }
 
     FishSim fish;
     for (Vec2d point : mPath) {
-    	flock.run();
-    	flock.seek(point);
+        std::cout << "Path: " << "X :" << point.x << " Y : " << point.y << std::endl;
+        if ((point.x != 0) && (point.y != 0)){
+            //std::cout << "Running flocking and seeking" << std::endl;
+            flock.seek(point);
+            flock.update();
+            flock.run();
+        }
     	const std::vector<Boid*> boids = flock.getBoids();
-    	std::cout << "Path: " << "X :" << point.x << " Y : " << point.y << std::endl;
     	for(int i = 0; i < boids.size(); ++i){
     		math::Vec2d location = boids[i]->getLocation();
+            math::Vec2d velocity = boids[i]->getVelocity();
+            math::Vec2d acceleration = boids[i]->getAcceleration();
     		std::cout << "Boid :" << i << ": X :"<< location.x << " Y : " << location.y << std::endl;
+            // std::cout << "Boid velocity:" << i << ": X :"<< velocity.x << " Y : " << velocity.y << std::endl;
+            // std::cout << "Boid acceleration:" << i << ":  X :"<< acceleration.x << " Y : " << acceleration.y << std::endl;
             fish.set_fish_id(i);
     		fish.set_pos_x(location.x);
     		fish.set_pos_y(location.y);
@@ -83,6 +91,7 @@ Simulation::frame(long long simTimeInMS)
                 fish.SerializeToOstream(&fd);
             }
     	}
+
     }
 
 	return false;

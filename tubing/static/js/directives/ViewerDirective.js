@@ -11,6 +11,8 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
             var container;
             var renderer, ocean;
             var text, plane;
+            var simtime = 0;
+            var txt;
 
             scope.targetRotation = 0;
             scope.targetRotationOnMouseDown = 0;
@@ -122,6 +124,8 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
 
             // scope.<something> is a way of combining this directive (the <fish-viewer> tag) with this function
             scope.init = function() {
+                txt = datalog2.split(",");
+                //alert(txt);
                 // The initial window setup
                 scope._setup_window_size();
 
@@ -160,7 +164,7 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
 
                 // We just need to look for events on the element
                 scope._setup_event_listener();
-                testSimple();
+                //testSimple();
 
             }
 
@@ -261,28 +265,17 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
                 var height = 128;
             
                 mesh = new THREE.Sprite( material );
-                mesh.scale.set( width, height, 1 );
+                //mesh.scale.set( width, height, 1 );
                 
                 //mesh.position.set( x, y, z );
                 var axis = new THREE.Vector3( 0, 1, 1 );
                 mesh.rotation.set( rx, ry, rz );
 
                 mesh.position.set( x, z, y );
+                mesh.scale.set( s, s, s );
+
                 idShapeMap[id] = mesh;
                 scope.group.add( mesh );
-
-                if (enableBoundary) {
-                    // line
-
-                    var geometry = shape.createPointsGeometry();
-                    var material = new THREE.LineBasicMaterial( { linewidth: 10, color: 0x333333, transparent: true } );
-
-                    var line = new THREE.Line( geometry, material );
-                    line.position.set( x, y, z );
-                    line.rotation.set( rx, ry, rz );
-                    line.scale.set( s, s, s );
-                    scope.group.add( line );
-                }
             }
             
             function addfish1(id, x, y, rx, ry, s) {
@@ -328,7 +321,7 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
                 debugShape.lineTo(-6, 8);
                 debugShape.lineTo(-6, -8);
                 
-                addSpriteShape( id, debugShape, 0xAAAAAA, x, y, 0, rx, 0, ry, s, "http://localhost/iis-85.png");    
+                addSpriteShape( id, debugShape, 0xAAAAAA, x, y, 0, rx, 0, ry, s, "static/img/babelfish.png");    
                 
                         
             }
@@ -359,14 +352,45 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
                 scope._addShape( id, obsShape, 0x000000, 0, 0, 0, 0, 0, 0, 1 );
             }
             
-
+            function readTextFile(file)
+            {
+                var rawFile = new XMLHttpRequest();
+                rawFile.open("GET", file, false);
+                rawFile.onreadystatechange = function ()
+                {
+                    if(rawFile.readyState === 4)
+                    {
+                        if(rawFile.status === 200 || rawFile.status == 0)
+                        {
+                            var allText = rawFile.responseText;
+                            alert(allText);
+                        }
+                    }
+                }
+                rawFile.send(null);
+            }
             
             function testSimple() {
-                addFrame();
+                //addFrame();
                 var points = [200, 200, 250, 200, 250, 250, 300, 250, 300, 300, 200, 300];
-                addObstacles(1, points);
-                addfish1(2, 500, 500, 0, Math.PI, 1);   
-                addfishBlock(3, 500, 500, 0, Math.PI/2, 5);             
+                //addObstacles(1, points);
+                //addfish1(2, 0, 0, 0, Math.PI, 1);   
+                addfishBlock(2, 0, 0, 0, Math.PI/2, scope.obstacle_tile_size);
+                addfishBlock(3, 0, 0, 0, Math.PI/2, scope.obstacle_tile_size); 
+                addfishBlock(4, 0, 0, 0, Math.PI/2, scope.obstacle_tile_size);            
+
+                var margin = 25;
+                var geometry = new THREE.Geometry();
+                for (i = 0; i < txt.length; i = i+8) { 
+                     geometry.vertices.push(new THREE.Vector3(margin + txt[i]*scope.obstacle_tile_size, margin + txt[i+1]*scope.obstacle_tile_size, 0));
+                }
+                var material = new THREE.LineBasicMaterial({
+                        color: 0x0000ff
+                });
+
+                var line = new THREE.Line(geometry, material);
+                scope.scene.add(line);
+                scope.scene.add(scope.group);
             }               
             
             function testfishOrientation() {
@@ -446,15 +470,18 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
             scope.update = function() {
                 // TBD - do this for every data packet received
                 {
-                    var shapeId = 3; // XXX - hardcoded for testing purpose
-                    var shapeId2 = 2;
+                        
+                    var shapeId = 2; // XXX - hardcoded for testing purpose
+                    var shapeId2 = 3;
+                    var shapeId3 = 4;
                     
-                
                     // TBD - get the data from network
                 
                     var shape = idShapeMap[shapeId];
                     var shape2 = idShapeMap[shapeId2];
+                    var shape3 = idShapeMap[shapeId3];
                     
+                    /*
                     // XXX - testing code 
                     shape.position.x = shape.position.x + 1;
                     shape.position.y = shape.position.y + 1;
@@ -463,6 +490,20 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
                     shape2.position.x = shape2.position.x + 1;
                     shape2.position.y = shape2.position.y + 2;
                     shape2.rotation.z = shape2.rotation.z + 0.01;
+                    */
+                    simtime++; 
+                    //console.log("Simtime is : " + simtime);
+                    var index = Math.floor((simtime/100))*8;
+                    //console.log("index is : " + index);
+                    shape.position.x = parseInt(txt[index+2])*scope.obstacle_tile_size;
+                    shape.position.y = parseInt(txt[index+3])*scope.obstacle_tile_size;
+                    //console.log("Fish is at " + txt[index+2] + "," + (txt[index+3]) + " at simtime " + simtime);
+                     
+                    shape2.position.x = parseInt(txt[index+4])*scope.obstacle_tile_size;
+                    shape2.position.y = parseInt(txt[index+5])*scope.obstacle_tile_size;
+                    
+                    shape3.position.x = parseInt(txt[index+6])*scope.obstacle_tile_size;
+                    shape3.position.y = parseInt(txt[index+7])*scope.obstacle_tile_size;
                 }
             }
 
@@ -484,6 +525,7 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
 
                 scope._clear_scene();
                 scope._generate_map_scene();
+                testSimple();
             }, true);
 
             scope.init();

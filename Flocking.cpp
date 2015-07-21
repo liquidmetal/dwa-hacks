@@ -7,8 +7,8 @@ using namespace math;
 // Boid
 ////////////////
 
-double Boid::desiredSeparation = 50.0;
-double Boid::neighborDist = 100.0;
+double Boid::desiredSeparation = 1;
+double Boid::neighborDist = 2;
 
 Boid::Boid(int id, Vec2d location, Vec2i borderMin, Vec2i borderMax, bool borderWrapping, bool borderRepulsion,
            Vec2d acceleration, Vec2d velocity, double maxSpeed, double maxForce) :
@@ -114,7 +114,7 @@ math::Vec2d Boid::separate(const std::vector<Boid*>& boids)
 
 void Boid::flock(const std::vector<Boid*>& boids)
 {
-    Vec2d separationForce = separate(boids) * 1.5; // Emphasize separation over the other two forces
+    Vec2d separationForce = separate(boids); // Emphasize separation over the other two forces
     Vec2d alignForce = align(boids);
     Vec2d cohesionForce = cohesion(boids);
 
@@ -308,6 +308,13 @@ void Flock::seek(Vec2d target)
     {
         boids[i]->seek(target);
     }
+}
+
+void Flock::update(){
+    for(size_t i = 0; i < boids.size(); ++i)
+    {
+        boids[i]->update();
+    }    
 }
 
 void Flock::drift()
