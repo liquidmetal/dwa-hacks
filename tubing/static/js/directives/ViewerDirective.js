@@ -280,7 +280,7 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', fun
                 scope.group.add( mesh );
             }
             
-            function addfish1(id, x, y, rx, ry, s) {
+            scope.addfish1 = function(id, x, y, rx, ry, s) {
                 // Fish
                 //x = y = 0;
                 rx = typeof rx !== 'undefined' ? rx : 0;
@@ -304,8 +304,8 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', fun
                 fishShape.quadraticCurveTo(57.5, 0, 57.5, 40);
                 fishShape.quadraticCurveTo(42.5, 10, 32.5, 10);
                 fishShape.quadraticCurveTo(-7.5, 80, -57.5, 0);
-                var transform = scope._addShape( id, fishShape, 0x222222, x, y, 0, rx, 0, ry, s );
-                scope.group.add(transform);
+                var transform = scope._addShape( id, fishShape, 0x222222, x, 0, y, rx, 0, ry, s );
+                scope.group_fish.add(transform);
             }
             
             function addfishBlock(id, x, y, rx, ry, s) {
@@ -470,7 +470,7 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', fun
             }
             
             scope.update = function() {
-                // TBD - do this for every data packet received
+                /*// TBD - do this for every data packet received
                 {
                         
                     var shapeId = 2; // XXX - hardcoded for testing purpose
