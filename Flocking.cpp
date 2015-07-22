@@ -11,7 +11,7 @@ double Boid::desiredSeparation = 1;
 double Boid::neighborDist = 2;
 
 Boid::Boid(int id, Vec2d location, Vec2i borderMin, Vec2i borderMax, bool borderWrapping, bool borderRepulsion,
-           Vec2d acceleration, Vec2d velocity, double maxSpeed, double maxForce) :
+           Vec2d acceleration, Vec2d velocity, double orientation, double maxSpeed, double maxForce) :
     id(id),
     location(location),
     borderMin(borderMin),
@@ -20,6 +20,7 @@ Boid::Boid(int id, Vec2d location, Vec2i borderMin, Vec2i borderMax, bool border
     borderRepulsion(borderRepulsion),
     acceleration(acceleration),
     velocity(velocity),
+    orientation(orientation),
     maxSpeed(maxSpeed),
     maxForce(maxForce)
 {
@@ -33,7 +34,7 @@ void Boid::run(const std::vector<Boid*>& boids)
     update();
 
     if(borderWrapping)
-        wrapToBorders();
+       wrapToBorders();
 
     if(borderRepulsion)
         borderRepulse();
@@ -48,6 +49,7 @@ void Boid::update()
 {
     velocity = velocity + acceleration;
     velocity.limit(maxSpeed);
+    orientation = atan(velocity.y / velocity.x) * 180/PI;
     location = location + velocity;
     acceleration = acceleration * 0;
 }
@@ -73,7 +75,7 @@ Vec2d Boid::steer(Vec2d target)
 
 void Boid::seek(Vec2d target)
 {
-    acceleration += steer(target);
+    acceleration += steer(target) * 2;
 }
 
 math::Vec2d Boid::separate(const std::vector<Boid*>& boids)
@@ -114,7 +116,7 @@ math::Vec2d Boid::separate(const std::vector<Boid*>& boids)
 
 void Boid::flock(const std::vector<Boid*>& boids)
 {
-    Vec2d separationForce = separate(boids); // Emphasize separation over the other two forces
+    Vec2d separationForce = separate(boids) * 1.5; // Emphasize separation over the other two forces
     Vec2d alignForce = align(boids);
     Vec2d cohesionForce = cohesion(boids);
 
@@ -122,6 +124,7 @@ void Boid::flock(const std::vector<Boid*>& boids)
     applyForce(alignForce);
     applyForce(cohesionForce);
 }
+
 
 math::Vec2d Boid::align(const std::vector<Boid*>& boids)
 {
@@ -201,6 +204,7 @@ void Boid::drift()
     acceleration += steer(target);
 }
 
+
 void Boid::wrapToBorders()
 {
     // Wrap x coordinate
@@ -227,12 +231,17 @@ void Boid::wrapToBorders()
 
 void Boid::borderRepulse()
 {
-    if(location.x < borderMin.x || location.x > borderMax.x
-            || location.y < borderMin.y || location.y > borderMax.y)
-    //        || location.z < borderMin.z || location.z > borderMax.z)
-    {
-        seek(borderCenter);
-    }
+    if(location.x <= borderMin.x)
+        location.x = borderMin.x + 1; 
+    
+    if (location.x >= borderMax.x)
+        location.x = borderMax.x - 1;
+    
+    if (location.y <= borderMin.y)
+        location.y = borderMin.y + 1;
+    
+    if (location.y >= borderMax.y)
+        location.y = borderMax.y - 1;
 }
 
 bool Boid::getBorderWrapping()
@@ -263,6 +272,11 @@ math::Vec2d Boid::getVelocity()
 math::Vec2d Boid::getAcceleration()
 {
     return acceleration;
+}
+
+double Boid::getOrientation()
+{
+    return orientation;
 }
 
 double Boid::getMaxForce()
@@ -325,10 +339,10 @@ void Flock::drift()
     }
 }
 
-int Flock::addBoid(Vec2d location, Vec2d acceleration, Vec2d velocity, double maxSpeed, double maxForce)
+int Flock::addBoid(Vec2d location, Vec2d acceleration, Vec2d velocity, double orientation, double maxSpeed, double maxForce)
 {
     boids.push_back(new Boid(boidIDCounter, location, borderMin, borderMax, borderWrapping, borderRepulsion, acceleration, velocity,
-                               maxSpeed, maxForce));
+                               orientation, maxSpeed, maxForce));
     ++boidIDCounter;
     return boidIDCounter;
 }

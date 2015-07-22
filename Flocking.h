@@ -13,7 +13,7 @@ class Boid {
 public:
 
     Boid(int id, math::Vec2d location, math::Vec2i borderMin, math::Vec2i borderMax, bool borderWrapping, bool borderRepulsion,
-         math::Vec2d acceleration, math::Vec2d velocity, double maxSpeed, double maxForce);
+         math::Vec2d acceleration, math::Vec2d velocity, double orientation, double maxSpeed, double maxForce);
 
     void run(const std::vector<Boid*>& boids);
     void applyForce(math::Vec2d force);
@@ -34,6 +34,7 @@ public:
     int getID();
     math::Vec2d getLocation();
     math::Vec2d getVelocity();
+    double getOrientation();
     math::Vec2d getAcceleration();
     double getMaxForce();
     double getMaxSpeed();
@@ -53,6 +54,7 @@ private:
     math::Vec2d borderCenter;
 
     double driftAngle;
+    double orientation;
     double maxForce;    // Maximum steering force
     double maxSpeed;    // Maximum speed
 
@@ -75,6 +77,7 @@ public:
     // Returns the boid id for the created boid
     int addBoid(math::Vec2d location, math::Vec2d acceleration,
                 math::Vec2d velocity,
+                double orientation,
                 double maxSpeed, 
 		        double maxForce);
 

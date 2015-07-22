@@ -1,4 +1,4 @@
-angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($log, $window) {
+angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', function($log, $window, Sim) {
     return {
         restrict: 'E',
         templateUrl: '/static/template/fish_viewer.html',
@@ -85,7 +85,9 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
                                                                               scope.window_height);
 
                 scope.group_obstacle = new THREE.Group();
+                scope.group_fish = new THREE.Group();
                 scope.scene.add(scope.group_obstacle);
+                scope.scene.add(scope.group_fish);
 
                 scope.generate_obstacle_rect(scope.obstacle_tile_size, 0, 0);
 
@@ -125,6 +127,8 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
             // scope.<something> is a way of combining this directive (the <fish-viewer> tag) with this function
             scope.init = function() {
                 txt = datalog2.split(",");
+                scope.frameNumber = 0;
+                scope.last_time = 0;
                 //alert(txt);
                 // The initial window setup
                 scope._setup_window_size();
@@ -278,7 +282,7 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
                 scope.group.add( mesh );
             }
             
-            function addfish1(id, x, y, rx, ry, s) {
+            scope.addfish1 = function(id, x, y, rx, ry, s) {
                 // Fish
                 //x = y = 0;
                 rx = typeof rx !== 'undefined' ? rx : 0;
@@ -302,8 +306,8 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
                 fishShape.quadraticCurveTo(57.5, 0, 57.5, 40);
                 fishShape.quadraticCurveTo(42.5, 10, 32.5, 10);
                 fishShape.quadraticCurveTo(-7.5, 80, -57.5, 0);
-                var transform = scope._addShape( id, fishShape, 0x222222, x, y, 0, rx, 0, ry, s );
-                scope.group.add(transform);
+                var transform = scope._addShape( id, fishShape, 0x222222, x, 0, y, rx, 0, ry, s );
+                scope.group_fish.add(transform);
             }
             
             function addfishBlock(id, x, y, rx, ry, s) {
@@ -468,7 +472,24 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
             }
             
             scope.update = function() {
-                // TBD - do this for every data packet received
+                // TODO come up with a way to find out the current frame number
+                var fish_count = Sim.get_fish_count();
+                if(fish_count == 0) {
+                    return;
+                }
+
+                for(var i=0;i<fish_count;i++) {
+                    console.log(Sim.get_fish_on_frame(i, Math.floor(scope.frameNumber/60)));        // fish_id 0 at frame 0
+                    var fishData = Sim.get_fish_on_frame(i, Math.floor(scope.frameNumber/60));
+                    var shape = idShapeMap[fishData.fish_id + 2];
+                        
+                    shape.position.x = parseFloat(fishData.pos_x)*scope.obstacle_tile_size;
+                    shape.position.y = parseFloat(fishData.pos_y)*scope.obstacle_tile_size;
+                    //console.log(fishData.pos_x + "," fishData.pos_y);
+
+                }
+                scope.frameNumber += 1;
+                /*// TBD - do this for every data packet received
                 {
                         
                     var shapeId = 2; // XXX - hardcoded for testing purpose
@@ -490,7 +511,7 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
                     shape2.position.x = shape2.position.x + 1;
                     shape2.position.y = shape2.position.y + 2;
                     shape2.rotation.z = shape2.rotation.z + 0.01;
-                    */
+                    /
                     simtime++; 
                     //console.log("Simtime is : " + simtime);
                     var index = Math.floor((simtime/100))*8;
@@ -504,13 +525,14 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
                     
                     shape3.position.x = parseInt(txt[index+6])*scope.obstacle_tile_size;
                     shape3.position.y = parseInt(txt[index+7])*scope.obstacle_tile_size;
-                }
+                }*/
             }
 
             scope.animate = function() {
                 requestAnimationFrame( scope.animate );
                 scope.update();
                 scope.render();
+                scope.last_time = (new Date()).getTime();
             }
 
             scope.render = function() {
@@ -527,6 +549,18 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', function($
                 scope._generate_map_scene();
                 testSimple();
             }, true);
+
+            scope.$watch(function() {
+                return Sim.get_fish_count();
+            }, function(newval, oldval) {
+                if(newval == 0) {
+                    return;
+                }
+                $log.log("New fish created: " + newval);
+                var current_frame = Sim.get_current_frame();
+                var pos = Sim.get_fish_position(current_frame, newval-1);
+                scope.addfish1(newval-1, 25 + pos.pos_x, 25 + pos.pos_y, 0, 0, 0.05);
+            });
 
             scope.init();
             scope.animate();

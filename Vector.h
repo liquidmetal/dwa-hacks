@@ -5,6 +5,8 @@
 
 namespace math {
 
+#define PI 3.14159265
+
 inline int randomRange(int minValue, int maxValue)
 {
     return minValue + (rand() % (maxValue - minValue + 1));

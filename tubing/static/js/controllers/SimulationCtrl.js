@@ -9,8 +9,9 @@ angular.module('fishApp').controller('SimulationCtrl', ['$scope', '$log', '$rout
 
             Sim.wait_for_connection(function() {
                 // Now that we have all the data, we can start the simulation
-                debugger
                 Sim.start_simulation($scope.map_name);
+                Sim.get_fish_stream(function(data) {
+                });
             });
         }
 
@@ -19,6 +20,8 @@ angular.module('fishApp').controller('SimulationCtrl', ['$scope', '$log', '$rout
 
         $scope.initialize = function() {
             $scope.map_name = $routeParams.mapname;
+            $scope.frame_data = [];
+            $scope.frame_count = -1;
 
             $scope._load_map()
         }
