@@ -1,5 +1,6 @@
 #include "Simulation.h"
-#include <thread>
+#include "display.h"
+
 
 using namespace math;
 
@@ -15,8 +16,10 @@ Simulation::loadScene(char* mapFile)
 	auto startTime = std::chrono::steady_clock::now();
 	mStartTime = std::chrono::steady_clock::now();
     MapLoader ml;
+
 	//bool **data = ml.loadMap(mapFile);
-    bool **data = ml.loadVDBMap(mapFile);
+    bool **data = ml.loadVDBMap(mapFile);   //Loading VDB files now
+
 	const Vec2d startPosition = ml.getStartPosition();
 	const Vec2d endPosition = ml.getEndPosition();
     X_MAX = ml.getNumCols();
@@ -52,13 +55,13 @@ Simulation::frame(long long simTimeInMS)
 	        			 math::randomRange(0, Y_MAX));
 	for(int i = 0; i < 3; ++i)
     {
-        flock.addBoid(math::Vec2d(0, 0), 
+        flock.addBoid(math::Vec2d(0, 0),
             			math::Vec2d(0, 0),
                         math::Vec2d(
-                        math::randomRange(-4, 4) / 100.0, 
+                        math::randomRange(-4, 4) / 100.0,
                         math::randomRange(-5, 5) / 100.0
                         ),
-                        0,                       
+                        0,
                         1,
                         0.1
         );
@@ -161,7 +164,7 @@ Simulation::run()
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
 		if (duration > 33) {
 			std::cout << "Exceeded maximum allocated time." << std::endl;
-			exit(1);
+			//exit(1);
 		}
 		else if (duration > 16) {
 			continue;
