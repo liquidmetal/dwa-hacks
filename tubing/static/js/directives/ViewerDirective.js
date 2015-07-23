@@ -472,6 +472,7 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', fun
             }
             
             scope.update = function() {
+<<<<<<< HEAD
                 // TODO come up with a way to find out the current frame number
                 var fish_count = Sim.get_fish_count();
                 if(fish_count == 0) {
@@ -489,6 +490,8 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', fun
 
                 }
                 scope.frameNumber += 1;
+=======
+>>>>>>> ae381a8316d4ab10bfdf87110947e7ebae9aacfe
                 /*// TBD - do this for every data packet received
                 {
                         
@@ -559,6 +562,10 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', fun
                 $log.log("New fish created: " + newval);
                 var current_frame = Sim.get_current_frame();
                 var pos = Sim.get_fish_position(current_frame, newval-1);
+<<<<<<< HEAD
+=======
+                debugger
+>>>>>>> ae381a8316d4ab10bfdf87110947e7ebae9aacfe
                 scope.addfish1(newval-1, 25 + pos.pos_x, 25 + pos.pos_y, 0, 0, 0.05);
             });
 
