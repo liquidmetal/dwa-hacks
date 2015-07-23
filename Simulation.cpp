@@ -15,7 +15,8 @@ Simulation::loadScene(char* mapFile)
 	auto startTime = std::chrono::steady_clock::now();
 	mStartTime = std::chrono::steady_clock::now();
     MapLoader ml;
-    bool **data = ml.loadMap(mapFile);
+	//bool **data = ml.loadMap(mapFile);
+    bool **data = ml.loadVDBMap(mapFile);
 	const Vec2d startPosition = ml.getStartPosition();
 	const Vec2d endPosition = ml.getEndPosition();
     X_MAX = ml.getNumCols();
