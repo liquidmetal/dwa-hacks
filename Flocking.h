@@ -5,6 +5,7 @@
 
 // Local includes
 #include "Vector.h"
+#include "Scene.h"
 
 
 
@@ -20,6 +21,7 @@ public:
     void update();
     math::Vec2d steer(math::Vec2d target);
     void seek(math::Vec2d target);
+    void avoidObstacle(Scene *mScene);
     math::Vec2d separate(const std::vector<Boid*>& boids);
     void flock(const std::vector<Boid*>& boids);
     math::Vec2d align(const std::vector<Boid*>& boids);
@@ -67,10 +69,16 @@ public:
 
     Flock(math::Vec2i borderMin = math::Vec2i(), math::Vec2i borderMax = math::Vec2i(),
           bool borderWrapping = false, bool borderRepulsion = false);
+    void setBorderMin(math::Vec2i value) { borderMin = value;}
+    void setBorderMax(math::Vec2i value) { borderMax = value;}
+    //void setBorderWrapping(bool flag) { borderWrapping = flag;} 
+    void setBorderRepulsion(bool flag) { borderRepulsion = flag;};
+
     ~Flock();
 
     void run();
     void seek(math::Vec2d target);
+    void avoidObstacle(Scene* mScene);
     void update();
     void drift();
 

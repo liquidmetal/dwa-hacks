@@ -132,6 +132,7 @@ PathFinder::searchPath()
 			int maxX = mScene->getGrid().getMaxX() - 1;
 			int maxY = mScene->getGrid().getMaxY() - 1;
 			
+#if 0
 			if (node->x < maxX)
 				searchNode(node->x + 1, node->y, node->movementCost + 1, node);
 			if (node->x > 0)
@@ -148,6 +149,24 @@ PathFinder::searchPath()
 				searchNode(node->x + 1, node->y - 1, node->movementCost + 1.414, node);
 			if (node->x > 0 && node->y > 0)
 				searchNode(node->x - 1, node->y - 1, node->movementCost + 1.414, node);
+#else
+			if (node->x < maxX)
+			   	searchNode(node->x + 1, node->y, node->movementCost + 1, node);
+            if (node->x > 0)
+                searchNode(node->x - 1, node->y, node->movementCost + 1, node);
+            if (node->y < maxY)
+                searchNode(node->x, node->y + 1, node->movementCost + 1, node);
+            if (node->y > 0)
+                searchNode(node->x, node->y - 1, node->movementCost + 1, node);
+            if (node->x < maxX && node->y < maxY && mScene->getCell(node->x + 1, node->y) && mScene->getCell(node->x, node->y + 1))
+                searchNode(node->x + 1, node->y + 1, node->movementCost + 1.414, node);
+            if (node->x > 0 && node->y < maxY && mScene->getCell(node->x - 1, node->y) && mScene->getCell(node->x, node->y + 1))
+                searchNode(node->x - 1, node->y + 1, node->movementCost + 1.414, node);
+            if (node->x < maxX && node->y > 0 && mScene->getCell(node->x + 1, node->y) && mScene->getCell(node->x, node->y - 1))
+                searchNode(node->x + 1, node->y - 1, node->movementCost + 1.414, node);
+            if (node->x > 0 && node->y > 0 && mScene->getCell(node->x - 1, node->y) && mScene->getCell(node->x, node->y - 1))
+                searchNode(node->x - 1, node->y - 1, node->movementCost + 1.414, node);
+#endif
 		}
 	}
 }

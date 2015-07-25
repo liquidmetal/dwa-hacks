@@ -1,6 +1,11 @@
 #include "Simulation.h"
+<<<<<<< HEAD
 #include <iostream>
 #include <thread>
+=======
+#include "display.h"
+
+>>>>>>> fabd7f068eb02cee3b033a1c17ae9e515cea6d23
 
 using namespace math;
 
@@ -16,7 +21,10 @@ Simulation::loadScene(char* mapFile)
 	auto startTime = std::chrono::steady_clock::now();
 	mStartTime = std::chrono::steady_clock::now();
     MapLoader ml;
-    bool **data = ml.loadMap(mapFile);
+
+	//bool **data = ml.loadMap(mapFile);
+    bool **data = ml.loadVDBMap(mapFile);   //Loading VDB files now
+
 	const Vec2d startPosition = ml.getStartPosition();
 	const Vec2d endPosition = ml.getEndPosition();
     X_MAX = ml.getNumCols();
@@ -47,6 +55,7 @@ Simulation::loadScene(char* mapFile)
 bool
 Simulation::frame(long long simTimeInMS)
 {
+<<<<<<< HEAD
     const double THRESHOLD =  1;
     // find the closest point and approach to that
     const std::vector<Boid*> boids = flock.getBoids();
@@ -72,6 +81,23 @@ Simulation::frame(long long simTimeInMS)
         }
     } else {
         return false;
+=======
+    Flock flock(math::Vec2i(0, 0), math::Vec2i(X_MAX, Y_MAX), false, true);
+	math::Vec2d location(math::randomRange(0, X_MAX),
+	        			 math::randomRange(0, Y_MAX));
+	for(int i = 0; i < 3; ++i)
+    {
+        flock.addBoid(math::Vec2d(0, 0),
+            			math::Vec2d(0, 0),
+                        math::Vec2d(
+                        math::randomRange(-4, 4) / 100.0,
+                        math::randomRange(-5, 5) / 100.0
+                        ),
+                        0,
+                        1,
+                        0.1
+        );
+>>>>>>> fabd7f068eb02cee3b033a1c17ae9e515cea6d23
     }
         
 
@@ -255,7 +281,7 @@ Simulation::run()
 #if 0
 		/*if (duration > 33) {
 			std::cout << "Exceeded maximum allocated time." << std::endl;
-			exit(1);
+			//exit(1);
 		}
 		else*/
 #endif

@@ -1,6 +1,7 @@
 #include "MapLoader.h"
 #include "Vector.h"
 #include <cstring>
+#include "Simulation.h"
 
 bool**
 MapLoader::loadMap(char* filename)
@@ -30,15 +31,25 @@ MapLoader::loadMap(char* filename)
     long currentRow = 0;
     do {
         for(int i=0;i<numCols;i++) {
+            //std::cout << "Number of column : " << i << std::endl;
             if(line[i] == '.') {
                 // Mark it passable
                 mapData[currentRow][i] = true;
-            } else {
+            }
+#if 1  // XXX _ Its a hack till correct way is implemented
+            else if(line[i] == 'F') {
+                //fish positions
+                mFishPositions.push_back(math::Vec2d(currentRow,i));
+                mapData[currentRow][i] = true;
+            }
+#endif
+            else {
                 // Let it remain impassable (from memset)
             }
         }
         currentRow += 1;
-    } while(fgets(line, 1024, fp));
+        //std::cout << "Current row :" << currentRow << std::endl;
+    } while(fgets(line, 1024, fp) && (currentRow < numRows));
 
     // TODO Figure out how to get start and end positions
     posStart = math::Vec2d(0, 0);
@@ -70,4 +81,9 @@ MapLoader::getNumRows() {
 long
 MapLoader::getNumCols() {
     return numCols;
+}
+
+std::vector<math::Vec2d> MapLoader::getFishesFromMap() {
+
+    return mFishPositions;
 }

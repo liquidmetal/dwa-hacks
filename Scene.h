@@ -34,6 +34,11 @@ public:
 	}
 	bool getCell(unsigned int x, unsigned int y)
 	{
+		unsigned int maxX = mGrid.getMaxX();
+		unsigned int maxY = mGrid.getMaxY();
+		if ((x > maxX) || (y > maxY) || (x < 0) || (y < 0)){
+			return false;
+		}
 		return mGrid.getValue(x, y);
 	}
 private:
