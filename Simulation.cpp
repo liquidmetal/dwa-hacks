@@ -1,4 +1,5 @@
 #include "Simulation.h"
+#include "display.h"
 #include <iostream>
 #include <thread>
 
@@ -16,7 +17,10 @@ Simulation::loadScene(char* mapFile)
 	auto startTime = std::chrono::steady_clock::now();
 	mStartTime = std::chrono::steady_clock::now();
     MapLoader ml;
-    bool **data = ml.loadMap(mapFile);
+
+	bool **data = ml.loadMap(mapFile);
+    //bool **data = ml.loadVDBMap(mapFile);   //Loading VDB files now
+
 	const Vec2d startPosition = ml.getStartPosition();
 	const Vec2d endPosition = ml.getEndPosition();
     X_MAX = ml.getNumCols();
@@ -26,6 +30,7 @@ Simulation::loadScene(char* mapFile)
     printf("The grid is %d*%d\n", X_MAX, Y_MAX);
 
 	bool* passData = new bool[X_MAX * Y_MAX];
+	//memcpy(passData, data, sizeof(bool) * X_MAX * Y_MAX);
     for(int y=0;y<Y_MAX;y++) {
         for(int x=0;x<X_MAX;x++) {
             passData[y*X_MAX + x] = data[y][x];
@@ -143,6 +148,7 @@ Simulation::frame(long long simTimeInMS)
             math::Vec2d location = boids[i]->getLocation();
             math::Vec2d velocity = boids[i]->getVelocity();
             math::Vec2d acceleration = boids[i]->getAcceleration();
+            float orientation = boids[i]->getOrientation();
     		std::cout << "Boid :" << i << ": X :"<< location.x << " Y : " << location.y << std::endl;
             // std::cout << "Boid velocity:" << i << ": X :"<< velocity.x << " Y : " << velocity.y << std::endl;
             // std::cout << "Boid acceleration:" << i << ":  X :"<< acceleration.x << " Y : " << acceleration.y << std::endl;
