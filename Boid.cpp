@@ -12,6 +12,7 @@ Boid::Boid(int x, int y, int xbound, int ybound){
     maxforce = 0.1;
     orient = 0;
     endCorner.setval(xbound,ybound);
+    reachedDestination = false;
 }
 
 // Method to update location
@@ -31,12 +32,12 @@ void Boid::update(vector<Boid> &boids) {
 
 }
 
-void Boid::seek(Vec2f target) {
-    acc += steer(target);
+void Boid::seek(Vec2f target,float weight) {
+    acc += steer(target)*weight;
 }
 
-void Boid::avoid(Vec2f target) {
-    acc -= steer(target);
+void Boid::avoid(Vec2f target,float weight) {
+    acc -= steer(target)*weight;
 }
 
 void Boid::boundCheck() {

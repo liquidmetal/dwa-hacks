@@ -18,8 +18,8 @@ public:
 
 	void update(vector<Boid> &boids);
 
-    void seek(Vec2f target);
-    void avoid(Vec2f target);
+    void seek(Vec2f target,float weight=1);
+    void avoid(Vec2f target,float weight=1);
     void boundCheck();
 
     void flock(vector<Boid> &boids);
@@ -38,5 +38,7 @@ public:
 	float maxforce;
 	float maxspeed;
 	float orient;
+
+	bool reachedDestination;
 };
 

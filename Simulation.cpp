@@ -103,6 +103,8 @@ Simulation::init(char* pipeFile)
 
 
     flock.setBounds(x_bound,y_bound);
+    flock.setDestination(endPosition);
+    flock.setSceneMap(mScene);
 
     int seed=123;
 	for(int i = 0; i < 10; ++i) //!@#
