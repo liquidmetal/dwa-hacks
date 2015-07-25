@@ -103,6 +103,7 @@ Simulation::frame(long long simTimeInMS)
         math::Vec2d location = boidsCurrent[i]->getLocation();
         math::Vec2d velocity = boidsCurrent[i]->getVelocity();
         math::Vec2d acceleration = boidsCurrent[i]->getAcceleration();
+        float orientation = boids[i]->getOrientation();
         //std::cout << "Boid :" << i << ": X :"<< location.x << " Y : " << location.y << std::endl;
         // std::cout << "Boid velocity:" << i << ": X :"<< velocity.x << " Y : " << velocity.y << std::endl;
         // std::cout << "Boid acceleration:" << i << ":  X :"<< acceleration.x << " Y : " << acceleration.y << std::endl;
@@ -216,6 +217,10 @@ Simulation::init(char* pipeFile)
 	auto startTime = std::chrono::steady_clock::now();
 	PathFinder pathFinder;
 	mPath = pathFinder.getPath(mScene);
+    if (mPath.empty()) {
+        std::cout << "No paths found, fish cannot reach destination. Nothing to do here..." << std::endl;
+        exit(1);
+    }
 	openPipe(pipeFile);
 	auto endTime = std::chrono::steady_clock::now();
 	std::cout << "Init Time (ms) : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
