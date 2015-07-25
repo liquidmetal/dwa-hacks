@@ -45,8 +45,8 @@ MapLoader::loadMap(char* filename)
     } while(fgets(line, 1024, fp));
 
     // TODO Figure out how to get start and end positions
-    posStart = math::Vec2d(0, 0);
-    posEnd = math::Vec2d(numCols-1, numRows-1);
+    posStart = math::Vec2f(0, 0);
+    posEnd = math::Vec2f(numCols-1, numRows-1);
     loaded = true;
     return mapData;
 }
@@ -75,7 +75,7 @@ MapLoader::loadVDBMap(char* filename)
     // TODO Is this a constant?
     numCols = 100;
     numRows = 100;
-    
+
   	int x_bound = numRows;
 	int y_bound = 1;
 	int z_bound = numCols;
@@ -90,7 +90,7 @@ MapLoader::loadVDBMap(char* filename)
         memset(mapData[i], true, numCols);
         memset(grid_array[i],-999,numCols);
     }
-    
+
     for (openvdb::FloatGrid::ValueOnCIter iter = grid->cbeginValueOn(); iter; ++iter) {
 		openvdb::Coord pos = iter.getCoord();
 		if((pos.x()>=x_bound||pos.z()>=z_bound||pos.x()<0||pos.z()<0)&&(pos.y()!=y_bound)) {
@@ -102,17 +102,17 @@ MapLoader::loadVDBMap(char* filename)
 			mapData[pos.x()][pos.z()]=false;
 	}
 
-	
+
 	/* Write out .map file
     ofstream outMapFile;
     std::string outFileName = std::string(filename)+".map";
     outMapFile.open (outFileName);
-	
+
 	for(int x =x_bound-1;x>=0;x-=1)
 	{
 		for(int z =0;z<z_bound;z+=1)
-		{	
-			
+		{
+
 			if(mapData[x][z])
 				outMapFile<<".";
 			else
@@ -121,18 +121,18 @@ MapLoader::loadVDBMap(char* filename)
 		}
 		outMapFile<<"\n";
 	}
-	
+
 	outMapFile.close();
 	*/
-    
+
     // TODO Figure out how to get start and end positions
-    posStart = math::Vec2d(0, 0);
-    posEnd = math::Vec2d(numCols-1, numRows-1);
+    posStart = math::Vec2f(10, 10);
+    posEnd = math::Vec2f(numCols-1, numRows-1);
     loaded = true;
     return mapData;
 }
 
-float** 
+float**
 MapLoader::getSDF(){
 	return grid_array;
 }
@@ -142,22 +142,22 @@ MapLoader::MapLoader() {
     this->mapData = nullptr;
 }
 
-math::Vec2d 
+Vec2f
 MapLoader::getStartPosition() {
     return posStart;
 }
 
-math::Vec2d 
+Vec2f
 MapLoader::getEndPosition() {
     return posEnd;
 }
 
-long
+unsigned int
 MapLoader::getNumRows() {
     return numRows;
 }
 
-long
+unsigned int
 MapLoader::getNumCols() {
     return numCols;
 }

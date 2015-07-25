@@ -1,7 +1,8 @@
+
 #include "Simulation.h"
 #include <iostream>
 
-int simMain(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
     if(argc<2) {
         printf("Please use the following syntax to invoke this command\n");

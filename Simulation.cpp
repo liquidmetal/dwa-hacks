@@ -1,13 +1,9 @@
 #include "Simulation.h"
-#include "display.h"
+#include <unistd.h>     // Header File for sleeping.
 
 
 using namespace math;
 
-const bool T = true;
-const bool F = false;
-unsigned int X_MAX = 50;
-unsigned int Y_MAX = 25;
 
 
 void
@@ -15,99 +11,46 @@ Simulation::loadScene(char* mapFile)
 {
 	auto startTime = std::chrono::steady_clock::now();
 	mStartTime = std::chrono::steady_clock::now();
-    MapLoader ml;
 
-	//bool **data = ml.loadMap(mapFile);
     bool **data = ml.loadVDBMap(mapFile);   //Loading VDB files now
 
-	const Vec2d startPosition = ml.getStartPosition();
-	const Vec2d endPosition = ml.getEndPosition();
-    X_MAX = ml.getNumCols();
-    Y_MAX = ml.getNumRows();
+	startPosition = ml.getStartPosition();
+	endPosition = ml.getEndPosition();
 
-    printf("The grid is %d*%d\n", X_MAX, Y_MAX);
+    x_bound = ml.getNumCols();
+    y_bound = ml.getNumRows();
 
-	bool* passData = new bool[X_MAX * Y_MAX];
-	//memcpy(passData, data, sizeof(bool) * X_MAX * Y_MAX);
-    for(int y=0;y<Y_MAX;y++) {
-        for(int x=0;x<X_MAX;x++) {
-            passData[y*X_MAX + x] = data[y][x];
-            if(passData[y*X_MAX + x]) {
-                printf(".");
+    printf("The grid is %d*%d\n", x_bound, y_bound);
+
+	bool* passData = new bool[x_bound * y_bound];
+
+	for(int y=0;y<y_bound;y++) {
+        for(int x=0;x<x_bound;x++) {
+            passData[y*x_bound + x] = data[y][x];
+            if(passData[y*x_bound + x]) {
+                //printf(".");
             } else {
-                printf("#");
+                //printf("#");
             }
         }
-        printf("\n");
+        //printf("\n");
     }
 
-	Grid<bool> mapData(X_MAX, Y_MAX, passData);
+	Grid<bool> mapData(x_bound, y_bound, passData);
 	mScene = new Scene(startPosition, endPosition, mapData);
+
 	auto endTime = std::chrono::steady_clock::now();
 	std::cout << "Map Loading Time (ms) : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
 }
 
 bool
-Simulation::frame(long long simTimeInMS)
+Simulation::frame()
 {
-    Flock flock(math::Vec2i(0, 0), math::Vec2i(X_MAX, Y_MAX), false, true);
-	math::Vec2d location(math::randomRange(0, X_MAX),
-	        			 math::randomRange(0, Y_MAX));
-	for(int i = 0; i < 3; ++i)
-    {
-        flock.addBoid(math::Vec2d(0, 0),
-            			math::Vec2d(0, 0),
-                        math::Vec2d(
-                        math::randomRange(-4, 4) / 100.0,
-                        math::randomRange(-5, 5) / 100.0
-                        ),
-                        0,
-                        1,
-                        0.1
-        );
-    }
+    flock.update();
 
-    FishSim fish;
-    for (Vec2d point : mPath) {
-        std::cout << "Path: " << "X :" << point.x << " Y : " << point.y << std::endl;
-        if ((point.x != 0) && (point.y != 0)){
-            flock.seek(point);
-            flock.update();
-            flock.run();
-        }
-    	const std::vector<Boid*> boids = flock.getBoids();
-    	for(int i = 0; i < boids.size(); ++i){
-    		math::Vec2d location = boids[i]->getLocation();
-            math::Vec2d velocity = boids[i]->getVelocity();
-            math::Vec2d acceleration = boids[i]->getAcceleration();
-            float orientation = boids[i]->getOrientation();
-    		std::cout << "Boid :" << i << ": X :"<< location.x << " Y : " << location.y << std::endl;
-            fish.set_fish_id(i);
-    		fish.set_pos_x(location.x);
-    		fish.set_pos_y(location.y);
-            char sz = fish.ByteSize();
+    usleep(10000); //!@#
 
-            // Write to the pipe only if it was passed originally
-            if(bWriteToPipe) {
-                fd.write(&sz, sizeof(char));
-                fish.SerializeToOstream(&fd);
-            }
-    	}
-
-    }
-
-	return false;
-}
-
-void
-Simulation::onFrameStart()
-{
-}
-
-void
-Simulation::onFrameEnd()
-{
-
+	return true;
 }
 
 
@@ -145,7 +88,31 @@ Simulation::init(char* pipeFile)
 	mPath = pathFinder.getPath(mScene);
 	openPipe(pipeFile);
 	auto endTime = std::chrono::steady_clock::now();
-	std::cout << "Init Time (ms) : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
+
+
+	startPositionArea=10; //!@#
+	endPositionArea=10;
+
+    int startPosMinX = min((int)(startPosition.x-startPositionArea),0);
+    int startPosMaxX = min((int)(startPosition.x+startPositionArea),(int)x_bound);
+    int startPosMinY = min((int)(startPosition.y-startPositionArea),0);
+    int startPosMaxY = min((int)(startPosition.y+startPositionArea),(int)y_bound);
+
+    //endPosition-endPositionArea;
+    //endPosition+endPositionArea;
+
+
+    flock.setBounds(x_bound,y_bound);
+
+    int seed=123;
+	for(int i = 0; i < 10; ++i) //!@#
+    {
+        flock.addBoid((float)randomRange(startPosMinX,startPosMaxX,seed+i),(float)randomRange(startPosMinY,startPosMaxY,seed+i+1));//Arbritary 1. just to change y positions
+
+    }
+
+
+    std::cout << "Init Time (ms) : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
 }
 
 
@@ -155,28 +122,26 @@ Simulation::run()
 {
 	bool continueRunning = true;
 	static long long simTime = 0;
+
+
+
 	while (continueRunning) {
 		auto startTime = std::chrono::steady_clock::now();
-		onFrameStart();
-		continueRunning = frame(simTime);
-		onFrameEnd();
+
+
+
+		continueRunning = frame();
+
+
 		auto endTime = std::chrono::steady_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
-		if (duration > 33) {
-			std::cout << "Exceeded maximum allocated time." << std::endl;
-			//exit(1);
-		}
-		else if (duration > 16) {
-			continue;
-			simTime += duration;
-		}
-		else {
-			std::this_thread::sleep_for(endTime - startTime);
-			simTime += 16;
-		}
+
+		simTime+=duration;
 
 	}
 	closePipe();
+
+	std::cout << "Flocking simulation time (ms) : "<<simTime;
 	mEndTime = std::chrono::steady_clock::now();
 }
 
@@ -185,4 +150,15 @@ long long
 Simulation::totalTime()
 {
 	return std::chrono::duration_cast<std::chrono::seconds>(mEndTime - mStartTime).count();
+}
+
+
+Flocking* Simulation::getFlockHandle()
+{
+        return &flock;
+}
+
+Scene* Simulation::getSceneHandle()
+{
+        return mScene;
 }

@@ -1,5 +1,14 @@
-#include "display.h"
+#include <GL/gl.h>	// Header File For The OpenGL32 Library
+#include <GL/glu.h>	// Header File For The GLu32 Library
+#include <GL/freeglut.h>
+#include <GL/freeglut_ext.h>
+#include <unistd.h>     // Header File for sleeping.
+#include <thread>
 
+#include "Simulation.h"
+
+//#include "Simulation.h"
+#include <iostream>
 
 /* ASCII code for the escape key. */
 #define ESCAPE 27
@@ -7,21 +16,81 @@
 /* The number of our GLUT window */
 int window;
 
+Flocking* flockDisplay;
+Scene* sceneDisplay;
+
+//std::vector<DispFish> display_fishes;
 
 
-void drawFish(float x, float y,float z)
+int simMain(int argc, char* argv[])
 {
-    glTranslatef(x,y,z);		// Move Left 1.5 Units And Into The Screen 6.0
+    if(argc<2)
+    {
+        printf("Please use the following syntax to invoke this command\n");
+        printf("%s <map-path> [pipe-file]\n", argv[0]);
+        exit(0);
+        return 1;
+    }
+
+    // The command line parameters for this would look like this:
+    // <execname> <mapname>
+    char* mapFile = argv[1];
+    char* pipeFile = nullptr;
+    if(argc==3)
+    {
+        pipeFile = argv[2];
+    }
+
+    Simulation simulation;
+    simulation.loadScene(mapFile);
+    simulation.init(pipeFile);
+
+    flockDisplay = simulation.getFlockHandle();
+    sceneDisplay = simulation.getSceneHandle();
+
+    simulation.run();
+
+
+    std::cout << "Total Simulation Time : " << simulation.totalTime() << std::endl;
+    return 0;
+}
+
+
+
+void drawFish(float x, float y,float z,float orient)
+{
+    glTranslatef(x,y,z);
+    glRotatef(orient-90,0,0,1); //180- to fix counter clockwise. fish point up Y at orientation 0 so -90
 
     // draw a triangle (in smooth coloring mode)
     glBegin(GL_POLYGON);				// start drawing a polygon
-    glColor3f(0.0f,1.0f,0.0f);			// Set The Color To Green
+    glColor3f(1.0f,0.0f,0.0f);			// Set The Color To Green
     glVertex3f( 0.0f, 2.0f, 0.0f);		// Top
     glColor3f(0.0f,1.0f,0.0f);			// Set The Color To Green
     glVertex3f( 1.0f,-1.0f, 0.0f);		// Bottom Right
     glColor3f(0.0f,1.0f,0.0f);			// Set The Color To Green
     glVertex3f(-1.0f,-1.0f, 0.0f);		// Bottom Left
     glEnd();					// we're done with the polygon (smooth color interpolation)
+
+
+}
+
+void drawCell(float x, float y,float z,float r,float g, float b)
+{
+    glTranslatef(x,y,z);
+    float scale=0.5;
+    //drawing a cell
+    glBegin(GL_POLYGON);				// start drawing a polygon
+    glColor3f(r,g,b);
+    glVertex3f(-scale,scale, 0.0f);		// Top Left
+    glColor3f(r,g,b);
+    glVertex3f(scale,scale,0.0f);		// Top Right
+    glColor3f(r,g,b);
+    glVertex3f(scale,-scale, 0.0f);		// Bottom Right
+    glColor3f(r,g,b);
+    glVertex3f(-scale,-scale,0.0f);		// Bottom Left
+    glEnd();
+
 
 }
 
@@ -56,7 +125,7 @@ void ReSizeGLScene(int Width, int Height)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    gluPerspective(45.0f,(GLfloat)Width/(GLfloat)Height,0.1f,1000.0f);
+    gluPerspective(45.0f,(GLfloat)Width/(GLfloat)Height,0.1f,100000.0f);
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -66,13 +135,49 @@ void DrawGLScene()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		// Clear The Screen And The Depth Buffer
     glLoadIdentity();				// Reset The View
 
+    glTranslated(-50,-50,0);  //Reposition Camera
+    float zDepth = -250;
 
-    for(int i =0; i< display_fishes.size() ; i++)
+
+    if(sceneDisplay)
     {
-            drawFish(display_fishes[i].x,display_fishes[i].y,display_fishes[i].z);
+        Vec2i bounds = sceneDisplay->getBounds();
+        for(int i = 0 ; i < bounds.x;i++)
+        {
+            for(int j = 0 ; j < bounds.y;j++)
+            {
+                glPushMatrix();
+                if(sceneDisplay->getCell(i,j))
+                {
+                        drawCell(i,j,zDepth-1,0.9f,0.9f,1.0f);// -1 to put them below fishes
+                }
+                else
+                {
+                        drawCell(i,j,zDepth-1,0.7f,0.5f,0.2f);// -1 to put them below fishes
+                }
+
+
+                glPopMatrix();
+            }
+        }
     }
 
-    //drawFish(0.0f,0.0f,-100.0f);
+
+    if(flockDisplay)
+    {
+
+        vector<Boid> &boids = flockDisplay->boids;
+
+
+        for(int i =0; i< boids.size() ; i++)
+        {
+            glPushMatrix();
+            drawFish(boids[i].loc.x,boids[i].loc.y,zDepth,boids[i].orient);
+            glPopMatrix();
+
+        }
+
+    }
 
 
     // we need to swap the buffer to display our drawing.
@@ -98,10 +203,14 @@ void keyPressed(unsigned char key, int x, int y)
 
 
 
+
 int main(int argc, char **argv)
 {
 
-    //std::thread simMain(argc,argv); // Start the sim thread
+    flockDisplay=NULL;
+    sceneDisplay=NULL;
+
+    std::thread simThread(simMain,argc,argv); // Start the sim thread
 
 
     /* Initialize GLUT state - glut will take any command line arguments that pertain to it or
@@ -147,3 +256,5 @@ int main(int argc, char **argv)
 
     return 1;
 }
+
+

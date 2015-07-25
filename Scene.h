@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Fish.h"
 #include "Vector.h"
 #include "Grid.h"
+
+using namespace math;
 
 struct Cell
 {
@@ -12,18 +13,18 @@ struct Cell
 class Scene
 {
 public:
-	Scene(const Vec2d& startPosition, const Vec2d& endPosition, const Grid<bool>& grid)
+	Scene(const Vec2f& startPosition, const Vec2f& endPosition, const Grid<bool>& grid)
 		:mStartPosition(startPosition)
 		,mEndPosition(endPosition)
 		,mGrid(grid)
 	{
 	}
 
-	Vec2d getStartPosition() const
+	Vec2f getStartPosition() const
 	{
 		return mStartPosition;
 	}
-	Vec2d getEndPosition() const
+	Vec2f getEndPosition() const
 	{
 		return mEndPosition;
 	}
@@ -36,8 +37,12 @@ public:
 	{
 		return mGrid.getValue(x, y);
 	}
+	Vec2i getBounds()
+	{
+		return Vec2i(mGrid.getMaxX(),mGrid.getMaxY());
+	}
 private:
 	Grid<bool> mGrid;
-	Vec2d mStartPosition;
-	Vec2d mEndPosition;
+	Vec2f mStartPosition;
+	Vec2f mEndPosition;
 };

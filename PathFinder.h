@@ -2,7 +2,7 @@
 
 #include <vector>
 #include "Scene.h"
-#include <set> 
+#include <set>
 
 #ifdef __LINUX_COMPILE
 #include <limits>
@@ -19,7 +19,7 @@ struct SearchNode
 	double movementCost;
 	double hueristicCost;
 
-	SearchNode(int x, int y, int id, SearchNode* parent = nullptr) 
+	SearchNode(int x, int y, int id, SearchNode* parent = nullptr)
 		: parent(parent), x(x), y(y), id(id), movementCost(0), hueristicCost(0) {}
 
 	double getExpectedCost() const
@@ -37,7 +37,7 @@ struct SearchNode
 class PathFinder
 {
 public:
-	std::vector<Vec2d> getPath(Scene* scene);
+	std::vector<Vec2f> getPath(Scene* scene);
 	bool foundPath() const
 	{
 		return mFoundPath;
@@ -54,7 +54,7 @@ private:
 
 	std::vector<SearchNode*> mOpenList;
 	std::vector<SearchNode*> mClosedList;
-	std::vector<Vec2d> mPath;
+	std::vector<Vec2f> mPath;
 	SearchNode* mStartNode;
 	SearchNode* mEndNode;
 	bool mFoundPath;
