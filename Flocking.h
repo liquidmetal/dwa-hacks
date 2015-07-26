@@ -14,18 +14,19 @@ public:
     void setDestination(int x, int y,float area);
     void setDestination(Vec2f dest,float area);
     void setSceneMap(Scene* scene);
+    void useCollisionSDF(bool val);
+    vector<Boid> getBoids();
 
+
+//private:
     int x_bound,y_bound;
     Vec2f destination;
     float destinationArea;
-    int destinationMinX;
-    int destinationMaxX;
-    int destinationMinY;
-    int destinationMaxY;
-    Scene* sceneMap;
 
+    Scene* sceneMap;
+    bool useCollisionFromSDF;
+    float** collisionSDF;
     PathFinder pathFinder;
 
-	vector<Boid> boids;
-
+    vector<Boid> boids;
 };

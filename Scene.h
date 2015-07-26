@@ -52,9 +52,18 @@ public:
 	{
 		return Vec2i(mGrid.getMaxX(),mGrid.getMaxY());
 	}
+	float** getSDFhandle()
+	{
+		return sdfPointer;
+	}
+	void setSDFhandle(float** sdfHandle)
+	{
+		sdfPointer=sdfHandle;
+	}
 private:
 	Grid<bool> mGrid;
 	Vec2f mStartPosition;
 	Vec2f mEndPosition;
 	float mStartRadius,mEndRadius;
+	float** sdfPointer;
 };

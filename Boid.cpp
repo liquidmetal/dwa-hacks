@@ -14,6 +14,9 @@ Boid::Boid(int x, int y, int xbound, int ybound){
     endCorner.setval(xbound,ybound);
     reachedDestination = false;
     hitObstacle = false;
+
+    prevloc.setval(x,y);
+    prevSDF=-999;
 }
 
 // Method to update location

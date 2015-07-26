@@ -193,7 +193,8 @@ void DrawGLScene()
     if(flockDisplay)
     {
 
-        vector<Boid> &boids = flockDisplay->boids;
+        //vector<Boid> boids = flockDisplay->getBoids();
+        vector<Boid>& boids = flockDisplay->boids;
 
 
         for(int i =0; i< boids.size() ; i++)

@@ -34,6 +34,10 @@ public:
 	Vec2f loc,vel,acc;
 	Vec2i endCorner;
 
+    //Storing previous location and SDF for collision detection
+    Vec2f prevloc;
+    float prevSDF;
+
 	float r;
 	float maxforce;
 	float maxspeed;

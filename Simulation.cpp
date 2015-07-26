@@ -38,6 +38,7 @@ Simulation::loadScene(char* mapFile)
 
 	Grid<bool> mapData(x_bound, y_bound, passData);
 	mScene = new Scene(startPosition, endPosition, mapData , ml.getStartRadius(), ml.getEndRadius());
+    mScene->setSDFhandle(ml.getSDF());
 
 	auto endTime = std::chrono::steady_clock::now();
 	std::cout << "Map Loading Time (ms) : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
@@ -48,7 +49,7 @@ Simulation::frame()
 {
     int status = flock.update();
 
-    usleep(10000); //!@#
+    //usleep(10000); //!@#
 
     if(status)
         return true;
@@ -110,9 +111,10 @@ Simulation::init(char* pipeFile)
     flock.setBounds(x_bound,y_bound);
     flock.setDestination(endPosition,endPositionRadius); //!@#
     flock.setSceneMap(mScene);
+    flock.useCollisionSDF(true);
 
     int seed=123;
-	for(int i = 0; i < 10; ++i) //!@#
+	for(int i = 0; i < 20; ++i) //!@#
     {
         float rand_radius = (float)randomRange(0,(int)(startPositionRadius*100),seed+i)/100;
 
