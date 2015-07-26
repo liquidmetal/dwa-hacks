@@ -114,8 +114,12 @@ Simulation::init(char* pipeFile)
     int seed=123;
 	for(int i = 0; i < 10; ++i) //!@#
     {
-        flock.addBoid((float)randomRange(startPosMinX,startPosMaxX,seed+i),(float)randomRange(startPosMinY,startPosMaxY,seed+i+1));//Arbritary 1. just to change y positions
+        float rand_radius = (float)randomRange(0,(int)(startPositionRadius*100),seed+i)/100;
 
+        float theta = (float)randomRange(0,360,seed+i+1);//Arbritary +1. just to change seed
+
+        flock.addBoid(startPosition.x+rand_radius*cos(theta*PI/180),startPosition.y+rand_radius*sin(theta*PI/180));
+        //flock.addBoid((float)randomRange(startPosMinX,startPosMaxX,seed+i),(float)randomRange(startPosMinY,startPosMaxY,seed+i+1));//Arbritary 1. just to change y positions
     }
 
 

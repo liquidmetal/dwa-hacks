@@ -18,8 +18,8 @@ int Flocking::update()
             path = pathFinder.getPath(sceneMap,boids[i].loc);
             if(path.size()>1)
             {
-                Vec2f dest = path[min((int)path.size()-1,2)]; //!@#
-                boids[i].seek(dest,0.5); //seek the Goal !@#
+                Vec2f dest = path[min((int)path.size()-1,1)]; //!@#
+                boids[i].seek(dest,1.5); //seek the Goal !@#
             }
         }
         else

@@ -126,7 +126,7 @@ bool Boid::isHit(int x, int y, int radius) {
 // Separation
 // Method checks for nearby boids and steers away
 Vec2f Boid::separate(vector<Boid> &boids) {
-    float desiredseparation = 9.0f;
+    float desiredseparation = 10.0f;
     Vec2f steer;
     int count = 0;
 
@@ -170,7 +170,7 @@ Vec2f Boid::separate(vector<Boid> &boids) {
 // Alignment
 // For every nearby boid in the system, calculate the average velocity
 Vec2f Boid::align(vector<Boid> &boids) {
-    float neighbordist = 10.0;
+    float neighbordist = 15.0;
     Vec2f steer;
     int count = 0;
     for (int i = 0 ; i < boids.size(); i++) {
@@ -202,7 +202,7 @@ Vec2f Boid::align(vector<Boid> &boids) {
 // Cohesion
 // For the average location (i.e. center) of all nearby boids, calculate steering vector towards that location
 Vec2f Boid::cohesion(vector<Boid> &boids) {
-    float neighbordist = 10.0;
+    float neighbordist = 15.0;
     Vec2f sum;   // Start with empty vector to accumulate all locations
     int count = 0;
     for (int i = 0 ; i < boids.size(); i++) {

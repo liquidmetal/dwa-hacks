@@ -150,7 +150,7 @@ void DrawGLScene()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		// Clear The Screen And The Depth Buffer
     glLoadIdentity();				// Reset The View
 
-    glTranslated(-50,-50,0);  //Reposition Camera
+    glTranslated(-100,-100,0);  //Reposition Camera
     float zDepth = -250;
 
 
@@ -160,12 +160,12 @@ void DrawGLScene()
 
         //Start
         glPushMatrix();
-        drawRegion(sceneDisplay->getStartPosition().x, sceneDisplay->getStartPosition().y,zDepth,sceneDisplay->getStartRadius(),1,1,0);
+        drawRegion(sceneDisplay->getStartPosition().x, sceneDisplay->getStartPosition().y,zDepth,sceneDisplay->getStartRadius(),0,0,1);
         glPopMatrix();
 
         //End
         glPushMatrix();
-        drawRegion(sceneDisplay->getEndPosition().x, sceneDisplay->getEndPosition().y,zDepth,sceneDisplay->getEndRadius(),0,0.7,0.3);
+        drawRegion(sceneDisplay->getEndPosition().x, sceneDisplay->getEndPosition().y,zDepth,sceneDisplay->getEndRadius(),0,0.7,0);
         glPopMatrix();
 
 
@@ -260,7 +260,7 @@ int main(int argc, char **argv)
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH);
 
     /* get a 640 x 480 window */
-    glutInitWindowSize(640, 480);
+    glutInitWindowSize(800,800);
 
     /* the window starts at the upper left corner of the screen */
     glutInitWindowPosition(0, 0);
