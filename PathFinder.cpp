@@ -10,6 +10,34 @@ PathFinder::getPath(Scene* scene)
 	int startId = startY * mScene->getGrid().getMaxX() + startX;
 	mStartNode = new SearchNode(startX, startY, startId);
 
+	int endX = (int)mScene->getEndPosition().x;
+	int endY = (int)mScene->getEndPosition().y;
+	int endId = endY * mScene->getGrid().getMaxX() + endX;
+	mEndNode = new SearchNode(endX, endY, endId);
+	mStartNode->calculateHeuristicCost(mEndNode);
+
+	mOpenList.push_back(mStartNode);
+
+	searchPath();
+
+	if (mFoundPath) {
+		return mPath;
+	}
+	else {
+		return std::vector<Vec2f>();
+	}
+}
+
+std::vector<Vec2f>
+PathFinder::getPath(Scene* scene, Vec2f currentPosition)
+{
+	cleanup();
+	mScene = scene;
+	int startX = (int)currentPosition.x;
+	int startY = (int)currentPosition.y;
+	int startId = startY * mScene->getGrid().getMaxX() + startX;
+	mStartNode = new SearchNode(startX, startY, startId);
+
 
 	int endX = (int)mScene->getEndPosition().x;
 	int endY = (int)mScene->getEndPosition().y;
@@ -28,6 +56,7 @@ PathFinder::getPath(Scene* scene)
 		return std::vector<Vec2f>();
 	}
 }
+
 
 SearchNode*
 PathFinder::getNextNode()

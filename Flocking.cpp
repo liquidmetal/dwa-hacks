@@ -4,14 +4,22 @@ void Flocking::update() {
     int i;
     for(i = 0; i < boids.size(); i++) {
 
-        if(!sceneMap->getCell(boids[i].loc.x,boids[i].loc.y))
+        if(sceneMap->getCell(boids[i].loc.x,boids[i].loc.y)) // stupid collisions
         {
-                 boids[i].vel.x=-boids[i].vel.x;
-                 boids[i].vel.y=-boids[i].vel.y;
+            vector<Vec2f> path;
+            path = pathFinder.getPath(sceneMap,boids[i].loc);
+            if(path.size()>1)
+            {
+                destination = path[min((int)path.size()-1,2)]; //!@#
+                boids[i].seek(destination,0.1); //seek the Goal !@#
+            }
+        }
+        else
+        {
+            boids[i].hitObstacle = true;
         }
 
 
-        boids[i].seek(destination,0.1); //seek the Goal
         boids[i].update(boids);
     }
 }

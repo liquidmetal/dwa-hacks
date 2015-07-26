@@ -13,6 +13,7 @@ Boid::Boid(int x, int y, int xbound, int ybound){
     orient = 0;
     endCorner.setval(xbound,ybound);
     reachedDestination = false;
+    hitObstacle = false;
 }
 
 // Method to update location
@@ -27,7 +28,7 @@ void Boid::update(vector<Boid> &boids) {
     acc.setval(0,0);  // Resetval accelertion to 0 each cycle
     orient = (float)atan2(vel.y,vel.x) * 180/PI;
 
-    boundCheck();
+    boundCheck(5); //!@#
 
 
 }
@@ -40,30 +41,30 @@ void Boid::avoid(Vec2f target,float weight) {
     acc -= steer(target)*weight;
 }
 
-void Boid::boundCheck() {
+void Boid::boundCheck(int padding) {
 
-    if(loc.x>endCorner.x)
+    if(loc.x>endCorner.x-padding)
     {
-        loc.x=endCorner.x;
+        loc.x=endCorner.x-padding;
         vel.x=-vel.x;
+
     }
 
-    else if(loc.x<0)
+    else if(loc.x<0+padding)
      {
-         loc.x=0;
+         loc.x=0+padding;
          vel.x=-vel.x;
      }
 
-    if(loc.y>endCorner.y)
+    if(loc.y>endCorner.y-padding)
     {
-        loc.y=endCorner.y;
+        loc.y=endCorner.y-padding;
         vel.y=-vel.y;
     }
 
-
-    else if(loc.y<0)
+    else if(loc.y<0+padding)
     {
-        loc.y=0;
+        loc.y=0+padding;
         vel.y=-vel.y;
     }
 
@@ -125,7 +126,7 @@ bool Boid::isHit(int x, int y, int radius) {
 // Separation
 // Method checks for nearby boids and steers away
 Vec2f Boid::separate(vector<Boid> &boids) {
-    float desiredseparation = 10.0f;
+    float desiredseparation = 9.0f;
     Vec2f steer;
     int count = 0;
 
@@ -169,7 +170,7 @@ Vec2f Boid::separate(vector<Boid> &boids) {
 // Alignment
 // For every nearby boid in the system, calculate the average velocity
 Vec2f Boid::align(vector<Boid> &boids) {
-    float neighbordist = 15.0;
+    float neighbordist = 10.0;
     Vec2f steer;
     int count = 0;
     for (int i = 0 ; i < boids.size(); i++) {
@@ -201,7 +202,7 @@ Vec2f Boid::align(vector<Boid> &boids) {
 // Cohesion
 // For the average location (i.e. center) of all nearby boids, calculate steering vector towards that location
 Vec2f Boid::cohesion(vector<Boid> &boids) {
-    float neighbordist = 20.0;
+    float neighbordist = 10.0;
     Vec2f sum;   // Start with empty vector to accumulate all locations
     int count = 0;
     for (int i = 0 ; i < boids.size(); i++) {

@@ -57,18 +57,18 @@ int simMain(int argc, char* argv[])
 
 
 
-void drawFish(float x, float y,float z,float orient)
+void drawFish(float x, float y,float z,float orient,float r,float g, float b)
 {
     glTranslatef(x,y,z);
     glRotatef(orient-90,0,0,1); //180- to fix counter clockwise. fish point up Y at orientation 0 so -90
 
     // draw a triangle (in smooth coloring mode)
     glBegin(GL_POLYGON);				// start drawing a polygon
-    glColor3f(1.0f,0.0f,0.0f);			// Set The Color To Green
+    glColor3f(r,g,b);
     glVertex3f( 0.0f, 2.0f, 0.0f);		// Top
-    glColor3f(0.0f,1.0f,0.0f);			// Set The Color To Green
+    glColor3f(r,g,b);
     glVertex3f( 1.0f,-1.0f, 0.0f);		// Bottom Right
-    glColor3f(0.0f,1.0f,0.0f);			// Set The Color To Green
+    glColor3f(r,g,b);
     glVertex3f(-1.0f,-1.0f, 0.0f);		// Bottom Left
     glEnd();					// we're done with the polygon (smooth color interpolation)
 
@@ -172,7 +172,10 @@ void DrawGLScene()
         for(int i =0; i< boids.size() ; i++)
         {
             glPushMatrix();
-            drawFish(boids[i].loc.x,boids[i].loc.y,zDepth,boids[i].orient);
+            if(boids[i].hitObstacle)
+                drawFish(boids[i].loc.x,boids[i].loc.y,zDepth,boids[i].orient,1,0,0);
+            else
+                drawFish(boids[i].loc.x,boids[i].loc.y,zDepth,boids[i].orient,0,0.5,1);
             glPopMatrix();
 
         }

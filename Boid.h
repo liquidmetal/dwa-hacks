@@ -20,7 +20,7 @@ public:
 
     void seek(Vec2f target,float weight=1);
     void avoid(Vec2f target,float weight=1);
-    void boundCheck();
+    void boundCheck(int padding);
 
     void flock(vector<Boid> &boids);
     bool isHit(int x,int y, int radius);
@@ -40,5 +40,6 @@ public:
 	float orient;
 
 	bool reachedDestination;
+	bool hitObstacle;
 };
 

@@ -101,9 +101,15 @@ Simulation::init(char* pipeFile)
     //endPosition-endPositionArea;
     //endPosition+endPositionArea;
 
+    /*
+    for(Vec2f path : mPath)
+    {
+        std::cout<<"path "<<path.x<<" "<<path.y<<"\n";
+    }
+    */
 
     flock.setBounds(x_bound,y_bound);
-    flock.setDestination(endPosition);
+    flock.setDestination(mPath[1]); //!@#
     flock.setSceneMap(mScene);
 
     int seed=123;

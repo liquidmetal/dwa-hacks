@@ -38,6 +38,7 @@ class PathFinder
 {
 public:
 	std::vector<Vec2f> getPath(Scene* scene);
+	std::vector<Vec2f> getPath(Scene* scene, Vec2f currentPosition);
 	bool foundPath() const
 	{
 		return mFoundPath;

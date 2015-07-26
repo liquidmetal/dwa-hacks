@@ -1,6 +1,7 @@
 #pragma once
 #include "Boid.h"
 #include "Scene.h"
+#include "PathFinder.h"
 
 class Flocking {
 public:
@@ -18,6 +19,8 @@ public:
     Vec2f destination;
     float destinationArea;
     Scene* sceneMap;
+
+    PathFinder pathFinder;
 
 	vector<Boid> boids;
 
