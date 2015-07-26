@@ -29,7 +29,12 @@ private:
 
 	Scene* mScene;
 	std::vector<Vec2d> mPath;
+	std::vector<math::Vec2d> mFishPositions;
 	std::fstream fd;
 	std::chrono::steady_clock::time_point mStartTime;
 	std::chrono::steady_clock::time_point mEndTime;
+	//MapLoader ml;
+	std::vector<int> pointCounter;
+	int pointFlockSeeking;
+	Flock flock;
 };

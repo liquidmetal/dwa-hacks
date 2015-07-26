@@ -4,5 +4,5 @@ all:
 buffer:
 	protoc fish-sim.proto --cpp_out=. --python_out=tubing/
 
-vdb_map_converter:
-	g++ convertVDBtoMAP.cpp -std=c++0x -D__LINUX_COMPILE -lprotobuf -lopenvdb -lHalf -ltbb -o vdb_map_converter
+# vdb_map_converter:
+# 	g++ convertVDBtoMAP.cpp -std=c++0x -D__LINUX_COMPILE -lprotobuf -lopenvdb -lHalf -ltbb -o vdb_map_converter

@@ -1,7 +1,7 @@
 #include "Simulation.h"
 #include <iostream>
 
-int simMain(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
     if(argc<2) {
         printf("Please use the following syntax to invoke this command\n");
@@ -17,10 +17,10 @@ int simMain(int argc, char* argv[])
         pipeFile = argv[2];
     }
 
-	Simulation simulation;
-	simulation.loadScene(mapFile);
-	simulation.init(pipeFile);
-	simulation.run();
-	std::cout << "Total Simulation Time : " << simulation.totalTime() << std::endl;
-	return 0;
+    Simulation simulation;
+    simulation.loadScene(mapFile);
+    simulation.init(pipeFile);
+    simulation.run();
+    std::cout << "Total Simulation Time : " << simulation.totalTime() << std::endl;
+    return 0;
 }

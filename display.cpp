@@ -6,7 +6,7 @@
 
 /* The number of our GLUT window */
 int window;
-
+std::vector<dispFish> display_fishes;
 
 
 void drawFish(float x, float y,float z)
@@ -98,7 +98,7 @@ void keyPressed(unsigned char key, int x, int y)
 
 
 
-int main(int argc, char **argv)
+int dispMain(int argc, char **argv)
 {
 
     //std::thread simMain(argc,argv); // Start the sim thread

@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "Vector.h"
 
 class MapLoader
@@ -12,6 +13,7 @@ public:
     long getNumCols();
     float** getSDF(); // call this only if loadVDBMap() was called
     MapLoader();
+    std::vector<math::Vec2d> getFishesFromMap();
 
 private:
     bool** mapData;         // Stores the passibility of each block
@@ -20,4 +22,5 @@ private:
     bool loaded;
     long numRows, numCols;
 	float** grid_array;
+	std::vector<math::Vec2d> mFishPositions;
 };

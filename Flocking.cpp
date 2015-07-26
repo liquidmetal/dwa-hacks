@@ -8,7 +8,7 @@ using namespace math;
 ////////////////
 
 double Boid::desiredSeparation = 1;
-double Boid::neighborDist = 2;
+double Boid::neighborDist = 1;
 
 Boid::Boid(int id, Vec2d location, Vec2i borderMin, Vec2i borderMax, bool borderWrapping, bool borderRepulsion,
            Vec2d acceleration, Vec2d velocity, double orientation, double maxSpeed, double maxForce) :
@@ -73,9 +73,95 @@ Vec2d Boid::steer(Vec2d target)
     }
 }
 
+
 void Boid::seek(Vec2d target)
 {
-    acceleration += steer(target) * 2;
+    acceleration += steer(target) * 4;
+}
+
+
+void Boid::avoidObstacle(Scene *mScene)
+{
+    
+    unsigned int x = (unsigned int)location.x;
+    unsigned int y = (unsigned int)location.y;
+
+    if (!mScene->getCell(x + 2, y + 2)) {
+        acceleration += steer(Vec2d(x -1, y - 1));
+    }
+
+    if (!mScene->getCell(x + 1, y + 1)) {
+        acceleration += steer(Vec2d(x -1, y - 1));
+    }
+
+    if (!mScene->getCell(x + 2, y - 2)) {
+        acceleration += steer(Vec2d(x -1, y + 1));
+    }
+
+    if (!mScene->getCell(x + 1, y - 1)) {
+        acceleration += steer(Vec2d(x -1, y + 1));
+    }
+
+    if (!mScene->getCell(x - 2, y + 2)) {
+        acceleration += steer(Vec2d(x +1, y - 1));
+    }
+
+    if (!mScene->getCell(x - 1, y + 1)) {
+        acceleration += steer(Vec2d(x +1, y - 1));
+    }
+
+    if (!mScene->getCell(x - 2, y - 2)) {
+        acceleration += steer(Vec2d(x + 1, y + 1));
+    }
+
+    if (!mScene->getCell(x - 1, y - 1)) {
+        acceleration += steer(Vec2d(x + 1, y + 1));
+    }
+
+    if (!mScene->getCell(x + 2, y)) {
+        acceleration += steer(Vec2d(x - 1, y));
+    }
+
+    if (!mScene->getCell(x + 1, y)) {
+        acceleration += steer(Vec2d(x - 1, y));
+    }
+
+    if (!mScene->getCell(x - 2, y)) {
+        acceleration += steer(Vec2d(x + 1, y));
+    }
+
+    if (!mScene->getCell(x - 1, y)) {
+        acceleration += steer(Vec2d(x + 1, y));
+    }
+
+    if (!mScene->getCell(x, y + 2)) {
+        acceleration += steer(Vec2d(x, y - 1));
+    }
+
+    if (!mScene->getCell(x, y + 1)) {
+        acceleration += steer(Vec2d(x, y - 1));
+    }
+
+    if (!mScene->getCell(x, y - 2)) {
+        acceleration += steer(Vec2d(x, y + 1));
+    }
+
+    if (!mScene->getCell(x, y - 1)) {
+        acceleration += steer(Vec2d(x, y + 1));
+    }
+    //double distance = location.distance(boid->getLocation());
+    // if(!passData[u_int(location.x)][u_int(location.y)])
+    //     location.x -= 1;
+    //     location.y -= 1; 
+    
+    // if (location.x >= borderMax.x)
+    //     location.x = borderMax.x - 1;
+    
+    // if (location.y <= borderMin.y)
+    //     location.y = borderMin.y + 1;
+    
+    // if (location.y >= borderMax.y)
+    //     location.y = borderMax.y - 1;
 }
 
 math::Vec2d Boid::separate(const std::vector<Boid*>& boids)
@@ -116,7 +202,7 @@ math::Vec2d Boid::separate(const std::vector<Boid*>& boids)
 
 void Boid::flock(const std::vector<Boid*>& boids)
 {
-    Vec2d separationForce = separate(boids) * 1.5; // Emphasize separation over the other two forces
+    Vec2d separationForce = separate(boids) * 4.5; // Emphasize separation over the other two forces
     Vec2d alignForce = align(boids);
     Vec2d cohesionForce = cohesion(boids);
 
@@ -321,6 +407,14 @@ void Flock::seek(Vec2d target)
     for(size_t i = 0; i < boids.size(); ++i)
     {
         boids[i]->seek(target);
+    }
+}
+
+void Flock::avoidObstacle(Scene* mScene)
+{
+    for(size_t i = 0; i < boids.size(); ++i)
+    {
+        boids[i]->avoidObstacle(mScene);
     }
 }
 
