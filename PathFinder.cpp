@@ -1,6 +1,6 @@
 #include "PathFinder.h"
 
-std::vector<Vec2d>
+std::vector<Vec2f>
 PathFinder::getPath(Scene* scene)
 {
     cleanup();
@@ -9,16 +9,12 @@ PathFinder::getPath(Scene* scene)
     int startY = (int)mScene->getStartPosition().y;
     int startId = startY * mScene->getGrid().getMaxX() + startX;
     mStartNode = new SearchNode(startX, startY, startId);
-    
 
     int endX = (int)mScene->getEndPosition().x;
     int endY = (int)mScene->getEndPosition().y;
     int endId = endY * mScene->getGrid().getMaxX() + endX;
     mEndNode = new SearchNode(endX, endY, endId);
     mStartNode->calculateHeuristicCost(mEndNode);
-
-    if (!mScene->getCell(startX, startY) || !mScene->getCell(endX, endY))
-        return std::vector<Vec2d>();
 
     mOpenList.push_back(mStartNode);
 
@@ -28,9 +24,39 @@ PathFinder::getPath(Scene* scene)
         return mPath;
     }
     else {
-        return std::vector<Vec2d>();
+        return std::vector<Vec2f>();
     }
 }
+
+std::vector<Vec2f>
+PathFinder::getPath(Scene* scene, Vec2f currentPosition)
+{
+    cleanup();
+    mScene = scene;
+    int startX = (int)currentPosition.x;
+    int startY = (int)currentPosition.y;
+    int startId = startY * mScene->getGrid().getMaxX() + startX;
+    mStartNode = new SearchNode(startX, startY, startId);
+
+
+    int endX = (int)mScene->getEndPosition().x;
+    int endY = (int)mScene->getEndPosition().y;
+    int endId = endY * mScene->getGrid().getMaxX() + endX;
+    mEndNode = new SearchNode(endX, endY, endId);
+    mStartNode->calculateHeuristicCost(mEndNode);
+
+    mOpenList.push_back(mStartNode);
+
+    searchPath();
+
+    if (mFoundPath) {
+        return mPath;
+    }
+    else {
+        return std::vector<Vec2f>();
+    }
+}
+
 
 SearchNode*
 PathFinder::getNextNode()
@@ -94,7 +120,7 @@ PathFinder::searchNode(unsigned int x,unsigned int y, double movementCost, Searc
 
     for (SearchNode* node : mOpenList)
     {
-        if (id == node->id) 
+        if (id == node->id)
         {
             if (node->getExpectedCost() > newNode->getExpectedCost())
             {
@@ -120,10 +146,10 @@ PathFinder::searchPath()
         SearchNode* node = getNextNode();
         if (node->id == mEndNode->id)
         {
-            std::vector<Vec2d> inversePath;
+            std::vector<Vec2f> inversePath;
             while (node != nullptr)
             {
-                inversePath.push_back(Vec2d(node->x, node->y));
+                inversePath.push_back(Vec2f(node->x, node->y));
                 node = node->parent;
             }
 
@@ -134,8 +160,7 @@ PathFinder::searchPath()
         else {
             int maxX = mScene->getGrid().getMaxX() - 1;
             int maxY = mScene->getGrid().getMaxY() - 1;
-            
-#if 0
+
             if (node->x < maxX)
                 searchNode(node->x + 1, node->y, node->movementCost + 1, node);
             if (node->x > 0)
@@ -144,32 +169,14 @@ PathFinder::searchPath()
                 searchNode(node->x, node->y + 1, node->movementCost + 1, node);
             if (node->y > 0)
                 searchNode(node->x, node->y - 1, node->movementCost + 1, node);
-            if (node->x < maxX && node->y < maxY && mScene->getCell(node->x + 1, node->y) && mScene->getCell(node->x, node->y + 1))
+            if (node->x < maxX && node->y < maxY)
                 searchNode(node->x + 1, node->y + 1, node->movementCost + 1.414, node);
-            if (node->x > 0 && node->y < maxY && mScene->getCell(node->x - 1, node->y) && mScene->getCell(node->x, node->y + 1))
+            if (node->x > 0 && node->y < maxY)
                 searchNode(node->x - 1, node->y + 1, node->movementCost + 1.414, node);
-            if (node->x < maxX && node->y > 0 && mScene->getCell(node->x + 1, node->y) && mScene->getCell(node->x, node->y - 1))
+            if (node->x < maxX && node->y > 0)
                 searchNode(node->x + 1, node->y - 1, node->movementCost + 1.414, node);
-            if (node->x > 0 && node->y > 0 && mScene->getCell(node->x - 1, node->y) && mScene->getCell(node->x, node->y - 1))
+            if (node->x > 0 && node->y > 0)
                 searchNode(node->x - 1, node->y - 1, node->movementCost + 1.414, node);
-#else
-            if (node->x < maxX)
-                searchNode(node->x + 1, node->y, node->movementCost + 1, node);
-            if (node->x > 0)
-                searchNode(node->x - 1, node->y, node->movementCost + 1, node);
-            if (node->y < maxY)
-                searchNode(node->x, node->y + 1, node->movementCost + 1, node);
-            if (node->y > 0)
-                searchNode(node->x, node->y - 1, node->movementCost + 1, node);
-            if (node->x < maxX && node->y < maxY && mScene->getCell(node->x + 1, node->y) && mScene->getCell(node->x, node->y + 1))
-                searchNode(node->x + 1, node->y + 1, node->movementCost + 1.414, node);
-            if (node->x > 0 && node->y < maxY && mScene->getCell(node->x - 1, node->y) && mScene->getCell(node->x, node->y + 1))
-                searchNode(node->x - 1, node->y + 1, node->movementCost + 1.414, node);
-            if (node->x < maxX && node->y > 0 && mScene->getCell(node->x + 1, node->y) && mScene->getCell(node->x, node->y - 1))
-                searchNode(node->x + 1, node->y - 1, node->movementCost + 1.414, node);
-            if (node->x > 0 && node->y > 0 && mScene->getCell(node->x - 1, node->y) && mScene->getCell(node->x, node->y - 1))
-                searchNode(node->x - 1, node->y - 1, node->movementCost + 1.414, node);
-#endif
         }
     }
 }

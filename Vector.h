@@ -7,8 +7,9 @@ namespace math {
 
 #define PI 3.14159265
 
-inline int randomRange(int minValue, int maxValue)
+inline int randomRange(int minValue, int maxValue,unsigned int seed=0)
 {
+    srand(seed);
     return minValue + (rand() % (maxValue - minValue + 1));
 }
 template <class T>
@@ -17,6 +18,12 @@ public:
     T x, y;
 
     Vec2(T x = 0, T y = 0) : x(x), y(y) { }
+
+    inline void setval(T xs, T ys)
+    {
+        x = xs;
+        y = ys;
+    }
 
     inline const Vec2<T> operator *(T mul) const
     {

@@ -15,6 +15,9 @@
 
 /* The number of our GLUT window */
 int window;
+<<<<<<< HEAD
+std::vector<dispFish> display_fishes;
+=======
 
 Flocking* flockDisplay;
 Scene* sceneDisplay;
@@ -40,6 +43,7 @@ int simMain(int argc, char* argv[])
     {
         pipeFile = argv[2];
     }
+>>>>>>> usama
 
     Simulation simulation;
     simulation.loadScene(mapFile);
@@ -238,8 +242,12 @@ void keyPressed(unsigned char key, int x, int y)
 
 
 
+<<<<<<< HEAD
+int dispMain(int argc, char **argv)
+=======
 
 int main(int argc, char **argv)
+>>>>>>> usama
 {
 
     flockDisplay=NULL;
