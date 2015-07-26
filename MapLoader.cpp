@@ -112,30 +112,8 @@ MapLoader::loadVDBMap(char* filename)
 			mapData[pos.x()][pos.z()]=false;
 	}
 
-	
-	/* Write out .map file
-    ofstream outMapFile;
-    std::string outFileName = std::string(filename)+".map";
-    outMapFile.open (outFileName);
-	
-	for(int x =x_bound-1;x>=0;x-=1)
-	{
-		for(int z =0;z<z_bound;z+=1)
-		{	
-			
-			if(mapData[x][z])
-				outMapFile<<".";
-			else
-				outMapFile<<"#";
-
-		}
-		outMapFile<<"\n";
-	}
-	
-	outMapFile.close();
-	*/
     
-    // TODO Figure out how to get start and end positions
+    // Figure out how to get start and end positions
     posStart = math::Vec2d(0, 0);
     posEnd = math::Vec2d(numCols-1, numRows-1);
     loaded = true;

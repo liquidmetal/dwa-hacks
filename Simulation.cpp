@@ -26,11 +26,9 @@ Simulation::loadScene(char* mapFile)
     X_MAX = ml.getNumCols();
     Y_MAX = ml.getNumRows();
     mFishPositions = ml.getFishesFromMap();
-    //std:cout << FishPositions << 
     printf("The grid is %d*%d\n", X_MAX, Y_MAX);
 
     bool* passData = new bool[X_MAX * Y_MAX];
-    //memcpy(passData, data, sizeof(bool) * X_MAX * Y_MAX);
     for(int y=0;y<Y_MAX;y++) {
         for(int x=0;x<X_MAX;x++) {
             passData[y*X_MAX + x] = data[y][x];
@@ -50,127 +48,10 @@ Simulation::loadScene(char* mapFile)
 }
 
 bool
-Simulation::frame(long long simTimeInMS)
+Simulation::frame()
 {
-    const double THRESHOLD =  1;
-    // find the closest point and approach to that
-    const std::vector<Boid*> boids = flock.getBoids();
-    math::Vec2d location(0,0);
-    for(int i = 0; i < boids.size(); ++i){
-        location += boids[i]->getLocation();
-    }
 
-    location /= boids.size();
 
-    int currentPathPoint =  pointFlockSeeking;
-    // XXX - currently approching to first point in first frame 
-    // not correct, should improve it further
-    math::Vec2d pointToSeek = mPath[pointFlockSeeking];
-
-    if (mPath.size() != currentPathPoint) {
-        double distanceFromCurr = (mPath[currentPathPoint]-location).length();
-        double distanceFromNext = (mPath[currentPathPoint + 1]-location).length();
-
-        if (distanceFromCurr < THRESHOLD) {
-            pointToSeek = mPath[currentPathPoint + 1];
-            pointFlockSeeking = currentPathPoint + 1;
-        }
-    } else {
-        return false;
-    }
-        
-
-    flock.seek(pointToSeek);
-    //flock.update();
-    flock.run();
-    flock.avoidObstacle(mScene);
-    flock.update();
-
-    FishSim fish;
-    // Fish 0 is the path information
-    fish.set_fish_id(0);
-    fish.set_pos_x(pointToSeek.x);
-    fish.set_pos_y(pointToSeek.y);
-    char sz = fish.ByteSize();
-    if(bWriteToPipe) {
-        fd.write(&sz, sizeof(char));
-        fish.SerializeToOstream(&fd);
-    }
-    
-    // now send the positions the boids
-    const std::vector<Boid*> boidsCurrent = flock.getBoids();
-    for(int i = 0; i < boidsCurrent.size(); ++i){
-        math::Vec2d location = boidsCurrent[i]->getLocation();
-        math::Vec2d velocity = boidsCurrent[i]->getVelocity();
-        math::Vec2d acceleration = boidsCurrent[i]->getAcceleration();
-        float orientation = boids[i]->getOrientation();
-        //std::cout << "Boid :" << i << ": X :"<< location.x << " Y : " << location.y << std::endl;
-        // std::cout << "Boid velocity:" << i << ": X :"<< velocity.x << " Y : " << velocity.y << std::endl;
-        // std::cout << "Boid acceleration:" << i << ":  X :"<< acceleration.x << " Y : " << acceleration.y << std::endl;
-            
-        // Fish i + 1 is the actual fish data
-        fish.set_fish_id(i + 1);
-        fish.set_pos_x(location.x);
-        fish.set_pos_y(location.y);
-        char sz = fish.ByteSize();
-
-        // Write to the pipe only if it was passed originally
-        if(bWriteToPipe) {
-            fd.write(&sz, sizeof(char));
-            fish.SerializeToOstream(&fd);
-        }
-    }
-
-    return true;
-
-#if 0
-
-    FishSim fish;
-    for (Vec2d point : mPath) {
-        std::cout << "Path: " << "X :" << point.x << " Y : " << point.y << std::endl;
-        if ((point.x != 0) && (point.y != 0)){
-            flock.seek(point);
-            flock.update();
-            flock.run();
-        }
-
-        // Fish 0 is the path information
-        fish.set_fish_id(0);
-        fish.set_pos_x(point.x);
-        fish.set_pos_y(point.y);
-        char sz = fish.ByteSize();
-        if(bWriteToPipe) {
-            fd.write(&sz, sizeof(char));
-            fish.SerializeToOstream(&fd);
-        }
-
-        const std::vector<Boid*> boids = flock.getBoids();
-        for(int i = 0; i < boids.size(); ++i){
-            math::Vec2d location = boids[i]->getLocation();
-            math::Vec2d velocity = boids[i]->getVelocity();
-            math::Vec2d acceleration = boids[i]->getAcceleration();
-            float orientation = boids[i]->getOrientation();
-            std::cout << "Boid :" << i << ": X :"<< location.x << " Y : " << location.y << std::endl;
-            // std::cout << "Boid velocity:" << i << ": X :"<< velocity.x << " Y : " << velocity.y << std::endl;
-            // std::cout << "Boid acceleration:" << i << ":  X :"<< acceleration.x << " Y : " << acceleration.y << std::endl;
-            
-            // Fish i + 1 is the actual fish data
-            fish.set_fish_id(i + 1);
-            fish.set_pos_x(location.x);
-            fish.set_pos_y(location.y);
-            char sz = fish.ByteSize();
-
-            // Write to the pipe only if it was passed originally
-            if(bWriteToPipe) {
-                fd.write(&sz, sizeof(char));
-                fish.SerializeToOstream(&fd);
-            }
-        }
-
-    }
-#endif
-
-    // return false;
 }
 
 void
@@ -263,13 +144,7 @@ Simulation::run()
         onFrameEnd();
         auto endTime = std::chrono::steady_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
-#if 0
-        /*if (duration > 33) {
-            std::cout << "Exceeded maximum allocated time." << std::endl;
-            exit(1);
-        }
-        else*/
-#endif
+
         if (duration > 16) {
             continue;
             simTime += duration;

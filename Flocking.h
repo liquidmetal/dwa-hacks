@@ -26,7 +26,6 @@ public:
     void flock(const std::vector<Boid*>& boids);
     math::Vec2d align(const std::vector<Boid*>& boids);
     math::Vec2d cohesion(const std::vector<Boid*>& boids);
-    void drift();
     math::Vec2d steer();
 
     void wrapToBorders();
@@ -55,7 +54,6 @@ private:
     math::Vec2d target;
     math::Vec2d borderCenter;
 
-    double driftAngle;
     double orientation;
     double maxForce;    // Maximum steering force
     double maxSpeed;    // Maximum speed
@@ -71,7 +69,7 @@ public:
           bool borderWrapping = false, bool borderRepulsion = false);
     void setBorderMin(math::Vec2i value) { borderMin = value;}
     void setBorderMax(math::Vec2i value) { borderMax = value;}
-    //void setBorderWrapping(bool flag) { borderWrapping = flag;} 
+    void setBorderWrapping(bool flag) { borderWrapping = flag;} 
     void setBorderRepulsion(bool flag) { borderRepulsion = flag;};
 
     ~Flock();
@@ -80,7 +78,6 @@ public:
     void seek(math::Vec2d target);
     void avoidObstacle(Scene* mScene);
     void update();
-    void drift();
 
     // Returns the boid id for the created boid
     int addBoid(math::Vec2d location, math::Vec2d acceleration,
