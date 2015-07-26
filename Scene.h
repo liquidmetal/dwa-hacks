@@ -13,10 +13,12 @@ struct Cell
 class Scene
 {
 public:
-	Scene(const Vec2f& startPosition, const Vec2f& endPosition, const Grid<bool>& grid)
+	Scene(const Vec2f& startPosition, const Vec2f& endPosition, const Grid<bool>& grid,unsigned int startRadius,unsigned int endRadius)
 		:mStartPosition(startPosition)
 		,mEndPosition(endPosition)
 		,mGrid(grid)
+		,mStartRadius(startRadius)
+		,mEndRadius(endRadius)
 	{
 	}
 
@@ -27,6 +29,15 @@ public:
 	Vec2f getEndPosition() const
 	{
 		return mEndPosition;
+	}
+
+    float getStartRadius() const
+	{
+		return mStartRadius;
+	}
+	float getEndRadius() const
+	{
+		return mEndRadius;
 	}
 
 	const Grid<bool>& getGrid() const
@@ -45,4 +56,5 @@ private:
 	Grid<bool> mGrid;
 	Vec2f mStartPosition;
 	Vec2f mEndPosition;
+	float mStartRadius,mEndRadius;
 };

@@ -52,10 +52,25 @@ int simMain(int argc, char* argv[])
 
 
     std::cout << "Total Simulation Time : " << simulation.totalTime() << std::endl;
+
+    exit(0);
     return 0;
 }
 
+void drawRegion(float x, float y,float z,float radius,float r,float g, float b)
+{
+    glTranslatef(x,y,z);
+    glBegin(GL_POLYGON);
+    for(int i=0; i < 360; i+=1)
+	{
+	    //convert degrees into radians
+		float degInRad = i*PI/180;
+	    glColor3f(r,g,b);
+		glVertex3f(cos(degInRad)*radius,sin(degInRad)*radius,0);
+	}
+	glEnd();
 
+}
 
 void drawFish(float x, float y,float z,float orient,float r,float g, float b)
 {
@@ -142,6 +157,18 @@ void DrawGLScene()
     if(sceneDisplay)
     {
         Vec2i bounds = sceneDisplay->getBounds();
+
+        //Start
+        glPushMatrix();
+        drawRegion(sceneDisplay->getStartPosition().x, sceneDisplay->getStartPosition().y,zDepth,sceneDisplay->getStartRadius(),1,1,0);
+        glPopMatrix();
+
+        //End
+        glPushMatrix();
+        drawRegion(sceneDisplay->getEndPosition().x, sceneDisplay->getEndPosition().y,zDepth,sceneDisplay->getEndRadius(),0,0.7,0.3);
+        glPopMatrix();
+
+
         for(int i = 0 ; i < bounds.x;i++)
         {
             for(int j = 0 ; j < bounds.y;j++)
@@ -155,11 +182,11 @@ void DrawGLScene()
                 {
                         drawCell(i,j,zDepth-1,0.7f,0.5f,0.2f);// -1 to put them below fishes
                 }
-
-
                 glPopMatrix();
+
             }
         }
+
     }
 
 
@@ -172,10 +199,15 @@ void DrawGLScene()
         for(int i =0; i< boids.size() ; i++)
         {
             glPushMatrix();
-            if(boids[i].hitObstacle)
-                drawFish(boids[i].loc.x,boids[i].loc.y,zDepth,boids[i].orient,1,0,0);
+            if(!boids[i].reachedDestination)
+            {
+                if(boids[i].hitObstacle)
+                    drawFish(boids[i].loc.x,boids[i].loc.y,zDepth+1,boids[i].orient,1,0,0);
+                else
+                    drawFish(boids[i].loc.x,boids[i].loc.y,zDepth+1,boids[i].orient,0,0.5,1);
+            }
             else
-                drawFish(boids[i].loc.x,boids[i].loc.y,zDepth,boids[i].orient,0,0.5,1);
+                    drawFish(boids[i].loc.x,boids[i].loc.y,zDepth+1,boids[i].orient,0,1,0);
             glPopMatrix();
 
         }

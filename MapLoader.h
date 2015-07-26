@@ -14,12 +14,16 @@ public:
     unsigned int getNumCols();
     float** getSDF(); // call this only if loadVDBMap() was called
     MapLoader();
+    unsigned int getStartRadius();
+    unsigned int getEndRadius();
 
 private:
     bool** mapData;         // Stores the passibility of each block
     Vec2f  posStart;        // The starting point
     Vec2f  posEnd;          // The ending point
+    float startRadius,endRadius;
     bool loaded;
     unsigned int numRows, numCols;
 	float** grid_array;
 };
+

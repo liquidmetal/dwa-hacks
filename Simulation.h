@@ -54,7 +54,7 @@ private:
     unsigned int y_bound;
     Vec2f startPosition;
 	Vec2f endPosition;
-	float startPositionArea;
-	float endPositionArea;
+	float startPositionRadius;
+	float endPositionRadius;
 
 };

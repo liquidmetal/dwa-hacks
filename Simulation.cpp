@@ -37,7 +37,7 @@ Simulation::loadScene(char* mapFile)
     }
 
 	Grid<bool> mapData(x_bound, y_bound, passData);
-	mScene = new Scene(startPosition, endPosition, mapData);
+	mScene = new Scene(startPosition, endPosition, mapData , ml.getStartRadius(), ml.getEndRadius());
 
 	auto endTime = std::chrono::steady_clock::now();
 	std::cout << "Map Loading Time (ms) : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
@@ -46,11 +46,14 @@ Simulation::loadScene(char* mapFile)
 bool
 Simulation::frame()
 {
-    flock.update();
+    int status = flock.update();
 
     usleep(10000); //!@#
 
-	return true;
+    if(status)
+        return true;
+    else
+        return false;
 }
 
 
@@ -84,22 +87,18 @@ void
 Simulation::init(char* pipeFile)
 {
 	auto startTime = std::chrono::steady_clock::now();
-	PathFinder pathFinder;
-	mPath = pathFinder.getPath(mScene);
 	openPipe(pipeFile);
 	auto endTime = std::chrono::steady_clock::now();
 
 
-	startPositionArea=10; //!@#
-	endPositionArea=10;
+	startPositionRadius=mScene->getStartRadius();
+	endPositionRadius=mScene->getEndRadius();
 
-    int startPosMinX = min((int)(startPosition.x-startPositionArea),0);
-    int startPosMaxX = min((int)(startPosition.x+startPositionArea),(int)x_bound);
-    int startPosMinY = min((int)(startPosition.y-startPositionArea),0);
-    int startPosMaxY = min((int)(startPosition.y+startPositionArea),(int)y_bound);
+    int startPosMinX = min((int)(startPosition.x-startPositionRadius),0);
+    int startPosMaxX = min((int)(startPosition.x+startPositionRadius),(int)x_bound);
+    int startPosMinY = min((int)(startPosition.y-startPositionRadius),0);
+    int startPosMaxY = min((int)(startPosition.y+startPositionRadius),(int)y_bound);
 
-    //endPosition-endPositionArea;
-    //endPosition+endPositionArea;
 
     /*
     for(Vec2f path : mPath)
@@ -109,7 +108,7 @@ Simulation::init(char* pipeFile)
     */
 
     flock.setBounds(x_bound,y_bound);
-    flock.setDestination(mPath[1]); //!@#
+    flock.setDestination(endPosition,endPositionRadius); //!@#
     flock.setSceneMap(mScene);
 
     int seed=123;
@@ -136,10 +135,7 @@ Simulation::run()
 	while (continueRunning) {
 		auto startTime = std::chrono::steady_clock::now();
 
-
-
 		continueRunning = frame();
-
 
 		auto endTime = std::chrono::steady_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
@@ -149,7 +145,7 @@ Simulation::run()
 	}
 	closePipe();
 
-	std::cout << "Flocking simulation time (ms) : "<<simTime;
+	std::cout << "Flocking simulation time (ms) : "<<simTime<<std::endl;
 	mEndTime = std::chrono::steady_clock::now();
 }
 

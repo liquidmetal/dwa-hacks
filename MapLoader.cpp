@@ -76,6 +76,9 @@ MapLoader::loadVDBMap(char* filename)
     numCols = 100;
     numRows = 100;
 
+    startRadius = 10;
+    endRadius = 10;
+
   	int x_bound = numRows;
 	int y_bound = 1;
 	int z_bound = numCols;
@@ -160,4 +163,14 @@ MapLoader::getNumRows() {
 unsigned int
 MapLoader::getNumCols() {
     return numCols;
+}
+
+unsigned int
+MapLoader::getStartRadius() {
+    return startRadius;
+}
+
+unsigned int
+MapLoader::getEndRadius() {
+    return endRadius;
 }

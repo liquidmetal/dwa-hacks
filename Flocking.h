@@ -5,19 +5,23 @@
 
 class Flocking {
 public:
-	void update();
+	int update();
 	void addBoid();
 	void addBoid(int x, int y);
     void removeBoid(int x, int y, int radius);
     void setBounds(int xbound=100, int ybound=100);
     int flockSize();
-    void setDestination(int x, int y);
-    void setDestination(Vec2f dest);
+    void setDestination(int x, int y,float area);
+    void setDestination(Vec2f dest,float area);
     void setSceneMap(Scene* scene);
 
     int x_bound,y_bound;
     Vec2f destination;
     float destinationArea;
+    int destinationMinX;
+    int destinationMaxX;
+    int destinationMinY;
+    int destinationMaxY;
     Scene* sceneMap;
 
     PathFinder pathFinder;

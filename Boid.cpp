@@ -115,7 +115,7 @@ void Boid::flock(vector<Boid> &boids) {
  */
 bool Boid::isHit(int x, int y, int radius) {
     int r = 1;
-    int range = 50;//calculation error range
+    int range = 1;//calculation error range
     int dist =r + radius - range;
     if(pow((x-loc.x),2)+pow((y-loc.y),2) < dist * dist) {
         return true;
