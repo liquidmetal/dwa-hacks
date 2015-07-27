@@ -9,7 +9,16 @@ using namespace std;
 class Boid {
 public:
 
-	Boid(int x=0, int y=0, int xbound =100, int ybound=100);
+	Boid(int x, int y, int xbound, int ybound,
+		int 	mboundaryPadding	,
+		float 	mmaxSpeed 			,
+		float 	mmaxForce 			,
+		float 	mflockSepWeight 	,
+		float 	mflockAliWeight 	,
+		float 	mflockCohWeight 	,
+		float 	mflockSepRadius 	,
+		float 	mflockAliRadius 	,
+		float 	mflockCohRadius 	);
 
 
     float dist(Vec2f v1,Vec2f v2);
@@ -34,16 +43,20 @@ public:
 	Vec2f loc,vel,acc;
 	Vec2i endCorner;
 
-    //Storing previous location and SDF for collision detection
-    Vec2f prevloc;
-    float prevSDF;
-
-	float r;
-	float maxforce;
-	float maxspeed;
+    float r;
 	float orient;
 
 	bool reachedDestination;
 	bool hitObstacle;
+
+	int 	boundaryPadding;
+	float 	maxSpeed;	
+	float 	maxForce;	
+	float 	flockSepWeight;
+	float 	flockAliWeight;
+	float 	flockCohWeight;
+	float 	flockSepRadius;
+	float 	flockAliRadius;
+	float 	flockCohRadius;
 };
 

@@ -34,26 +34,27 @@ MapLoader::loadVDBMap(char* filename)
     string endy = grid->metaValue<string>("endy");
     string end_radius = grid->metaValue<string>("end_radius");
 
-    numCols = stoi(boundx);
-    numRows = stoi(boundy);
+    x_boundary = stoi(boundx);
+    y_boundary = stoi(boundy);
 
     startRadius = stof(start_radius);
     endRadius = stof(end_radius);
 
-  	int x_bound = numCols;
-	int y_bound = numRows;
-    int z_bound = 0;
+  	int x_bound = x_boundary;
+	int y_bound = y_boundary;
+    int z_bound = 0; 
 
     // Create the map data
-    mapData = (bool**)malloc(sizeof(bool*) * numRows);
-    grid_array = (float**)malloc(sizeof(float*) * numRows);
-    for(int i=0;i<numRows;i++) {
-    	grid_array[i] = (float*)malloc(sizeof(float) * numCols);
-        mapData[i] = (bool*)malloc(sizeof(bool) * numCols);
-        memset(mapData[i], true, numCols);
-        memset(grid_array[i],-999,numCols);
+    mapData = (bool**)malloc(sizeof(bool*) * y_boundary);
+    grid_array = (float**)malloc(sizeof(float*) * y_boundary);
+    for(int i=0;i<y_boundary;i++) {
+    	grid_array[i] = (float*)malloc(sizeof(float) * x_boundary);
+        mapData[i] = (bool*)malloc(sizeof(bool) * x_boundary);
+        memset(mapData[i], true, x_boundary);
+        memset(grid_array[i],-999,x_boundary);
     }
 
+    /*
     for (openvdb::FloatGrid::ValueOnCIter iter = grid->cbeginValueOn(); iter; ++iter) {
 		openvdb::Coord pos = iter.getCoord();
 		if((pos.x()>=x_bound||pos.y()>=y_bound||pos.x()<0||pos.y()<0)&&(pos.z()!=z_bound)) {
@@ -61,9 +62,28 @@ MapLoader::loadVDBMap(char* filename)
 		}
 
 		grid_array[pos.x()][pos.y()]=*iter;
-		if(*iter<=0)
+		if(*iter<=0)//grid_array[pos.x()][pos.y()]
 			mapData[pos.x()][pos.y()]=false;
-	}
+
+		std::cout<<"Grid array "<<grid_array[pos.x()][pos.y()]<<"\n";
+
+	}*/
+
+	openvdb::FloatGrid::Accessor accessor = grid->getAccessor();
+	
+	for(int x=0;x<x_bound;x++) 
+	for(int y=0;y<y_bound;y++) 
+    {
+    		openvdb::Coord pos(x,y,z_bound);
+            grid_array[x][y] = accessor.getValue(pos);
+            
+            if(grid_array[x][y]<=0)
+			mapData[x][y]=false;
+
+		//std::cout<<"Grid array "<<grid_array[x][y]<<"\n";
+    }
+
+		 
 
 
     // TODO Figure out how to get start and end positions
@@ -94,13 +114,13 @@ MapLoader::getEndPosition() {
 }
 
 unsigned int
-MapLoader::getNumRows() {
-    return numRows;
+MapLoader::gety_boundary() {
+    return y_boundary;
 }
 
 unsigned int
-MapLoader::getNumCols() {
-    return numCols;
+MapLoader::getx_boundary() {
+    return x_boundary;
 }
 
 unsigned int

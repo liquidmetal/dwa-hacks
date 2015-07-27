@@ -3,9 +3,11 @@
 #include <GL/freeglut.h>
 #include <GL/freeglut_ext.h>
 #include <unistd.h>     // Header File for sleeping.
+#include <string.h>
 #include <thread>
 
 #include "Simulation.h"
+
 
 //#include "Simulation.h"
 #include <iostream>
@@ -20,30 +22,105 @@ Flocking* flockDisplay;
 Scene* sceneDisplay;
 
 //std::vector<DispFish> display_fishes;
+std::fstream fd;
+bool bWriteToPipe=false;
+void openPipe(char* pipeFile)
+{
+    if(pipeFile == nullptr) {
+        // Don't open the pipe if the pipe file arg wasn't passed
+        // Useful when debugging
+        bWriteToPipe = false;
+        return;
+    }
 
+    /* create the FIFO (named pipe) */
+    mkfifo(pipeFile, 0700);
+    fd.open(pipeFile, std::fstream::out);
+    bWriteToPipe = true;
+}
 
 int simMain(int argc, char* argv[])
 {
-    if(argc<2)
+    if(argc<15)
     {
-        printf("Please use the following syntax to invoke this command\n");
-        printf("%s <map-path> [pipe-file]\n", argv[0]);
+        printf("Ideally these are the parameters you should be passing to run the solver\n");
+        printf("%s <map_path> <sleep_time (ms)> <fish_count>			\
+			       <boundary_padding> <max_speed> <max_force>			\
+			       <flocking_separation_force_weight>					\
+			       <flocking_alignment_force_weight>					\
+			       <flocking_cohesion_force_weight>						\
+			       <collision_avoidance_weight>							\
+			       <flocking_separation_radius>							\
+			       <flocking_alignment_radius>							\
+			       <flocking_cohesion_radius>							\
+			       <destination_weight>									\
+			       <random_seed>										\
+			       														\
+			       [pipe_file] \n", argv[0]);
         exit(0);
         return 1;
     }
 
     // The command line parameters for this would look like this:
-    // <execname> <mapname>
-    char* mapFile = argv[1];
+    
+    char* mapFile 											= argv[1];	//path to the vdb file
+    char* sleep_time 										= argv[2];	//eventually you'll make this 0 to see how fast your solver really is.
+    char* fish_count 										= argv[3];
+    char* boundary_padding 									= argv[4];
+    char* max_speed 										= argv[5];
+    char* max_force 										= argv[6];
+    char* flocking_separation_force_weight 					= argv[7];
+    char* flocking_alignment_force_weight					= argv[8];
+    char* flocking_cohesion_force_weight					= argv[9];
+    char* collision_avoidance_weight						= argv[10];
+    char* flocking_separation_radius						= argv[11];
+    char* flocking_alignment_radius							= argv[12];
+    char* flocking_cohesion_radius							= argv[13];
+    char* destination_weight								= argv[14];
+    char* random_seed										= argv[15];
+
+
+
+    long sleepTime 				= stoi(sleep_time);
+    int fishCount 				= stoi(fish_count);
+    int boundaryPadding 		= stoi(boundary_padding);
+    float maxSpeed 				= stof(max_speed);
+    float maxForce 				= stof(max_force);
+    float flockSepWeight 		= stof(flocking_separation_force_weight);
+    float flockAliWeight 		= stof(flocking_alignment_force_weight);
+    float flockCohWeight 		= stof(flocking_cohesion_force_weight);
+    float collisionWeight 		= stof(collision_avoidance_weight);
+    float flockSepRadius 		= stof(flocking_separation_radius);
+    float flockAliRadius 		= stof(flocking_alignment_radius);
+    float flockCohRadius 		= stof(flocking_cohesion_radius);
+    float destWeight 			= stof(destination_weight);
+    int randSeed 				= stoi(random_seed);
+
+
     char* pipeFile = nullptr;
-    if(argc==3)
+    if(argc==16)
     {
-        pipeFile = argv[2];
+        pipeFile = argv[16];
+        std::cout<<"\nPipe File "<<pipeFile<"\n";
     }
+
+    openPipe(pipeFile);
 
     Simulation simulation;
     simulation.loadScene(mapFile);
-    simulation.init(pipeFile);
+    simulation.init(pipeFile,sleepTime,
+			    	fishCount,boundaryPadding,
+			    	maxSpeed,maxForce,
+			    	flockSepWeight,
+			    	flockAliWeight,
+			    	flockCohWeight,
+			    	collisionWeight,
+			    	flockSepRadius,
+			    	flockAliRadius,
+			    	flockCohRadius,
+			    	destWeight,
+			    	randSeed
+			    	);
 
     flockDisplay = simulation.getFlockHandle();
     sceneDisplay = simulation.getSceneHandle();
@@ -75,16 +152,17 @@ void drawRegion(float x, float y,float z,float radius,float r,float g, float b)
 void drawFish(float x, float y,float z,float orient,float r,float g, float b)
 {
     glTranslatef(x,y,z);
-    glRotatef(orient-90,0,0,1); //180- to fix counter clockwise. fish point up Y at orientation 0 so -90
+    float scale=1;
+    glRotatef(orient-90,0,0,1); //180_ to fix counter clockwise. fish point up Y at orientation 0 so _90
 
     // draw a triangle (in smooth coloring mode)
     glBegin(GL_POLYGON);				// start drawing a polygon
     glColor3f(r,g,b);
-    glVertex3f( 0.0f, 2.0f, 0.0f);		// Top
+    glVertex3f( 0.0f, scale*2, 0.0f);		// Top
     glColor3f(r,g,b);
-    glVertex3f( 1.0f,-1.0f, 0.0f);		// Bottom Right
+    glVertex3f( scale,-scale, 0.0f);		// Bottom Right
     glColor3f(r,g,b);
-    glVertex3f(-1.0f,-1.0f, 0.0f);		// Bottom Left
+    glVertex3f(-scale,-scale, 0.0f);		// Bottom Left
     glEnd();					// we're done with the polygon (smooth color interpolation)
 
 
@@ -144,6 +222,8 @@ void ReSizeGLScene(int Width, int Height)
     glMatrixMode(GL_MODELVIEW);
 }
 
+
+
 /* The main drawing function. */
 void DrawGLScene()
 {
@@ -193,12 +273,37 @@ void DrawGLScene()
     if(flockDisplay)
     {
 
-        //vector<Boid> boids = flockDisplay->getBoids();
+    	
         vector<Boid>& boids = flockDisplay->boids;
 
+        FishSim fish;
+    	// Fish 0 is the path information
+    		fish.set_fish_id(0);
+    		fish.set_pos_x(0);
+    		fish.set_pos_y(0);
+    		char sz = fish.ByteSize();
+    		if(bWriteToPipe) {
+    		    fd.write(&sz, sizeof(char));
+    		    fish.SerializeToOstream(&fd);
+    		}
 
         for(int i =0; i< boids.size() ; i++)
         {
+
+        	FishSim fish;
+    		// Fish 0 is the path information
+    		fish.set_fish_id(i+1);
+    		fish.set_pos_x(boids[i].loc.x);
+    		fish.set_pos_y(boids[i].loc.y);
+    		char sz = fish.ByteSize();
+    		if(bWriteToPipe) {
+    		    fd.write(&sz, sizeof(char));
+    		    fish.SerializeToOstream(&fd);
+    		}
+        	
+
+
+
             glPushMatrix();
             if(!boids[i].reachedDestination)
             {
@@ -249,8 +354,8 @@ int main(int argc, char **argv)
     std::thread simThread(simMain,argc,argv); // Start the sim thread
 
 
-    /* Initialize GLUT state - glut will take any command line arguments that pertain to it or
-       X Windows - look at its documentation at http://reality.sgi.com/mjk/spec3/spec3.html */
+    /* Initialize GLUT state _ glut will take any command line arguments that pertain to it or
+       X Windows _ look at its documentation at http://reality.sgi.com/mjk/spec3/spec3.html */
     glutInit(&argc, argv);
 
     /* Select type of Display mode:

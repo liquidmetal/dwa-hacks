@@ -17,8 +17,8 @@ Simulation::loadScene(char* mapFile)
 	startPosition = ml.getStartPosition();
 	endPosition = ml.getEndPosition();
 
-    x_bound = ml.getNumCols();
-    y_bound = ml.getNumRows();
+    x_bound = ml.getx_boundary();
+    y_bound = ml.gety_boundary();
 
     printf("The grid is %d*%d\n", x_bound, y_bound);
 
@@ -26,7 +26,7 @@ Simulation::loadScene(char* mapFile)
 
 	for(int y=0;y<y_bound;y++) {
         for(int x=0;x<x_bound;x++) {
-            passData[y*x_bound + x] = data[y][x];
+            passData[y*x_bound + x] = data[x][y];
             if(passData[y*x_bound + x]) {
                 //printf(".");
             } else {
@@ -42,6 +42,16 @@ Simulation::loadScene(char* mapFile)
 
 	auto endTime = std::chrono::steady_clock::now();
 	std::cout << "Map Loading Time (ms) : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
+
+	/*
+	for(int x=0;x<x_bound;x++) 
+	for(int y=0;y<y_bound;y++) {
+        {
+            std::cout<<"Grid array(in Simulation) "<<ml.getSDF()[x][y]<<"\n";
+        }
+        //printf("\n");
+    }
+    */
 }
 
 bool
@@ -49,7 +59,7 @@ Simulation::frame()
 {
     int status = flock.update();
 
-    //usleep(10000); //!@#
+    usleep(sleepTime); 
 
     if(status)
         return true;
@@ -85,12 +95,43 @@ Simulation::closePipe()
 
 
 void
-Simulation::init(char* pipeFile)
+Simulation::init(char* pipeFile				,
+              	long 	msleepTime 			,
+              	int 	mfishCount 			,
+              	int 	mboundaryPadding 	,
+              	float 	mmaxSpeed 			,
+              	float 	mmaxForce 			,
+           		float 	mflockSepWeight 	,
+           		float 	mflockAliWeight 	,
+           		float 	mflockCohWeight 	,
+           		float 	mcollisionWeight 	,
+           		float 	mflockSepRadius 	,
+           		float 	mflockAliRadius 	,
+           		float 	mflockCohRadius 	,
+           		float 	mdestWeight 		,
+           		int 	mrandSeed 			)
+
 {
 	auto startTime = std::chrono::steady_clock::now();
 	openPipe(pipeFile);
 	auto endTime = std::chrono::steady_clock::now();
 
+
+	sleepTime			= msleepTime		;
+  	fishCount 			= mfishCount 		;
+  	boundaryPadding 	= mboundaryPadding	;
+  	maxSpeed 			= mmaxSpeed 		;
+  	maxForce 			= mmaxForce 		;
+	flockSepWeight 		= mflockSepWeight 	;
+	flockAliWeight 		= mflockAliWeight 	;
+	flockCohWeight 		= mflockCohWeight 	;
+    collisionWeight 	= mcollisionWeight	;
+	flockSepRadius 		= mflockSepRadius 	;	
+	flockAliRadius 		= mflockAliRadius 	;
+	flockCohRadius 		= mflockCohRadius 	;
+    destWeight 			= mdestWeight 		;
+    randSeed 			= mrandSeed 		;
+	
 
 	startPositionRadius=mScene->getStartRadius();
 	endPositionRadius=mScene->getEndRadius();
@@ -101,31 +142,38 @@ Simulation::init(char* pipeFile)
     int startPosMaxY = min((int)(startPosition.y+startPositionRadius),(int)y_bound);
 
 
-    /*
-    for(Vec2f path : mPath)
-    {
-        std::cout<<"path "<<path.x<<" "<<path.y<<"\n";
-    }
-    */
-
     flock.setBounds(x_bound,y_bound);
-    flock.setDestination(endPosition,endPositionRadius); //!@#
+
+    flock.setSimulationParameters(boundaryPadding	,
+      			maxSpeed 		,
+  				maxForce 		,
+				flockSepWeight 	,
+				flockAliWeight 	,
+				flockCohWeight 	,
+    			collisionWeight ,
+				flockSepRadius 	,
+				flockAliRadius 	,
+				flockCohRadius 	,
+    			destWeight		); 		
+    
+    flock.setDestination(endPosition,endPositionRadius);
     flock.setSceneMap(mScene);
     flock.useCollisionSDF(true);
+    flock.calculatePartialDerivaties();
 
-    int seed=123;
-	for(int i = 0; i < 20; ++i) //!@#
+    int seed=randSeed;
+    
+	for(int i = 0; i < fishCount; ++i) 
     {
         float rand_radius = (float)randomRange(0,(int)(startPositionRadius*100),seed+i)/100;
-
         float theta = (float)randomRange(0,360,seed+i+1);//Arbritary +1. just to change seed
-
         flock.addBoid(startPosition.x+rand_radius*cos(theta*PI/180),startPosition.y+rand_radius*sin(theta*PI/180));
-        //flock.addBoid((float)randomRange(startPosMinX,startPosMaxX,seed+i),(float)randomRange(startPosMinY,startPosMaxY,seed+i+1));//Arbritary 1. just to change y positions
     }
-
+	
 
     std::cout << "Init Time (ms) : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
+
+    
 }
 
 

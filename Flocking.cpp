@@ -3,8 +3,10 @@
 int Flocking::update()
 {
     int i;
+    Vec2f centroid(0,0);
     for(i = 0; i < boids.size(); i++)
     {
+    	centroid+=boids[i].loc;
 
         if(boids[i].isHit(destination.x,destination.y,destinationArea))
         {
@@ -13,68 +15,25 @@ int Flocking::update()
 
         if(useCollisionFromSDF)
         {
-            float sdfval = collisionSDF[(int)boids[i].loc.x][(int)boids[i].loc.y];
-            float val,usesdfval;
-            Vec2f dir;
-
-            if(sdfval!=-999)
-            {
-                if(boids[i].prevSDF!=-999)
-                {
-                    val = sdfval-boids[i].prevSDF;
-
-                }
-                else
-                {
-                    val = 1;
-                }
-
-
-                if(sdfval==0)
-                {
-                    if(boids[i].prevSDF<0)
-                        usesdfval = 0.1;
-                    else
-                        usesdfval = -0.1;
-                }
-
-
-            }
-            else
-            {
-                val = 1;
-                usesdfval = 999;
-            }
-            dir = boids[i].loc-boids[i].prevloc;
-
-
-
-            if(val>0)
-                dir/=usesdfval;
-            else if(val<0)
-                dir/=-usesdfval;
-
-
-            //boids[i].seek(dir+boids[i].loc,dir.length()*0.1);
-
-            boids[i].prevSDF=sdfval;
-            boids[i].prevloc=boids[i].loc;
+            Vec2f dir = partialDerivaties[(int)boids[i].loc.x][(int)boids[i].loc.y];
+			boids[i].seek(dir+boids[i].loc,dir.length()*collisionWeight);
 
         }
 
+
         if(sceneMap->getCell(boids[i].loc.x,boids[i].loc.y))
         {
-
+        	/*
             vector<Vec2f> path;
             path = pathFinder.getPath(sceneMap,boids[i].loc);
             if(path.size()>1)
             {
                 Vec2f dest = path[min((int)path.size()-1,1)]; //!@#
-                boids[i].seek(dest,1); //seek the Goal !@#
+                boids[i].seek(dest,0.5); //seek the Goal !@#
             }
+			*/
 
-
-            //boids[i].seek(destination,0.5); //seek the Goal !@#
+            
         }
         else
         {
@@ -82,6 +41,7 @@ int Flocking::update()
         }
 
 
+        boids[i].seek(destinationSeek,destWeight); //seek the Goal !@#
         boids[i].update(boids);
 
         if(boids[i].reachedDestination)
@@ -89,20 +49,41 @@ int Flocking::update()
 
     }
 
+    centroid /=flockSize();
+
+    if(sceneMap->getCell(centroid.x,centroid.y))
+    	{
+        	
+            vector<Vec2f> path;
+            path = pathFinder.getPath(sceneMap,centroid);
+            if(path.size()>1)
+            {
+                destinationSeek = path[min((int)path.size()-1,10)]; 
+                
+            }
+			
+
+            
+        }
+
     if(flockSize()==0)
         return 0;
     else
         return 1;
 }
 
-void Flocking::addBoid()
-{
-    boids.push_back(Boid());
-}
 
 void Flocking::addBoid(int x, int y)
 {
-    boids.push_back(Boid(x, y, x_bound, y_bound));
+    boids.push_back(Boid(x, y, x_bound, y_bound, boundaryPadding, 
+    											maxSpeed 		,
+												maxForce 		,
+												flockSepWeight	,
+												flockAliWeight	,
+												flockCohWeight	,
+												flockSepRadius	,
+												flockAliRadius	,
+												flockCohRadius	));
 }
 
 void Flocking::removeBoid(int x, int y, int radius)
@@ -134,6 +115,7 @@ void Flocking::setDestination(int x, int y,float area)
 {
     destination.setval((float)x,(float)y);
     destinationArea = area;
+    destinationSeek=destination;
 }
 
 
@@ -162,4 +144,73 @@ void Flocking::useCollisionSDF(bool val)
 vector<Boid> Flocking::getBoids()
 {
     return boids;
+}
+
+Vec2f** Flocking::calculatePartialDerivaties()
+{
+	partialDerivaties = (Vec2f**)malloc(sizeof(Vec2f*) * x_bound);
+	for(int i=0;i<x_bound;i++)
+	{
+		partialDerivaties[i]=(Vec2f*)malloc(sizeof(Vec2f*) * y_bound);
+		memset(partialDerivaties[i],0,y_bound);
+	}
+
+	int padding=1;
+
+	for(int i=padding;i<x_bound-padding;i++)
+	{
+		for(int j=padding;j<y_bound-padding;j++)
+		{
+			float dify=0;
+			if(collisionSDF[i][j]==-999||collisionSDF[i][j-padding]==-999)
+				dify=0;
+			else
+				dify=collisionSDF[i][j]-collisionSDF[i][j-padding];
+
+			float difx=0;
+			if(collisionSDF[i][j]==-999||collisionSDF[i-padding][j]==-999)
+				difx=0;
+			else
+				difx=collisionSDF[i][j]-collisionSDF[i-padding][j];
+
+			partialDerivaties[i][j].setval(difx,dify);
+
+			
+			
+		}
+	}
+	
+
+
+
+	return partialDerivaties;
+		
+}
+
+
+
+void Flocking::setSimulationParameters(
+    		int 	mboundaryPadding 	,
+            float 	mmaxSpeed 			,
+            float 	mmaxForce 			,
+          	float 	mflockSepWeight 	,
+          	float 	mflockAliWeight 	,
+          	float 	mflockCohWeight 	,
+          	float 	mcollisionWeight 	,
+          	float 	mflockSepRadius 	,
+          	float 	mflockAliRadius 	,
+          	float 	mflockCohRadius 	,
+          	float 	mdestWeight 		)
+{
+	boundaryPadding 	=     mboundaryPadding 	;
+	maxSpeed 			=     mmaxSpeed 		;	
+	maxForce 			=     mmaxForce 		;	
+	flockSepWeight     	=     mflockSepWeight	;
+	flockAliWeight     	=     mflockAliWeight	;
+	flockCohWeight     	=     mflockCohWeight	;
+	collisionWeight 	=     mcollisionWeight	; 	
+	flockSepRadius     	=     mflockSepRadius	;
+	flockAliRadius     	=     mflockAliRadius	;
+	flockCohRadius     	=     mflockCohRadius	;
+	destWeight 			=     mdestWeight 		;
 }

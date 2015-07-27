@@ -14,13 +14,28 @@
 #include "fish-sim.pb.h"
 #include "MapLoader.h"
 
+
 using namespace math;
 
 class Simulation
 {
 public:
 	void loadScene(char* mapFile);
-	void init(char* pipeFile);
+	void init(char* pipeFile				,
+              	long 	msleepTime 			,
+              	int 	mfishCount 			,
+              	int 	mboundaryPadding 	,
+              	float 	mmaxSpeed 			,
+              	float 	mmaxForce 			,
+           		float 	mflockSepWeight 	,
+           		float 	mflockAliWeight 	,
+           		float 	mflockCohWeight 	,
+           		float 	mcollisionWeight 	,
+           		float 	mflockSepRadius 	,
+           		float 	mflockAliRadius 	,
+           		float 	mflockCohRadius 	,
+           		float 	mdestWeight 		,
+           		int 	mrandSeed 			);
 
 	bool frame();
 	void run();
@@ -31,8 +46,8 @@ public:
 
 	Simulation()
 	{
-	    x_bound = 100;
-	    y_bound = 100;
+	    x_bound = 200;
+	    y_bound = 200;
     }
 
 private:
@@ -56,5 +71,21 @@ private:
 	Vec2f endPosition;
 	float startPositionRadius;
 	float endPositionRadius;
+
+	//init variables
+	long sleepTime			;
+  	int fishCount 			;
+  	int boundaryPadding 	;
+  	float maxSpeed 			;
+  	float maxForce 			;
+	float flockSepWeight 	;
+	float flockAliWeight 	;
+	float flockCohWeight 	;
+    float collisionWeight 	;
+	float flockSepRadius 	;
+	float flockAliRadius 	;
+	float flockCohRadius 	;
+    float destWeight 		;
+    int randSeed 			;
 
 };

@@ -16,17 +16,47 @@ public:
     void setSceneMap(Scene* scene);
     void useCollisionSDF(bool val);
     vector<Boid> getBoids();
+    Vec2f** calculatePartialDerivaties();
 
+    void setSimulationParameters(
+    		int 	mboundaryPadding 	,
+            float 	mmaxSpeed 			,
+            float 	mmaxForce 			,
+          	float 	mflockSepWeight 	,
+          	float 	mflockAliWeight 	,
+          	float 	mflockCohWeight 	,
+          	float 	mcollisionWeight 	,
+          	float 	mflockSepRadius 	,
+          	float 	mflockAliRadius 	,
+          	float 	mflockCohRadius 	,
+          	float 	mdestWeight 		);
+           			
+    
 
 //private:
     int x_bound,y_bound;
     Vec2f destination;
     float destinationArea;
-
+    Vec2f destinationSeek;
     Scene* sceneMap;
     bool useCollisionFromSDF;
     float** collisionSDF;
+    Vec2f** partialDerivaties;
     PathFinder pathFinder;
 
     vector<Boid> boids;
+
+    //Simulation args
+    int 	boundaryPadding ;
+    float 	maxSpeed 		;
+    float 	maxForce 		;
+	float 	flockSepWeight ;
+	float 	flockAliWeight ;
+	float 	flockCohWeight ;
+	float 	collisionWeight; 
+	float 	flockSepRadius ;
+	float 	flockAliRadius ;
+	float 	flockCohRadius ;
+   	float 	destWeight 	;
+
 };
