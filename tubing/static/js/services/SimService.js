@@ -34,6 +34,14 @@ angular.module('fishApp').factory('Sim', ['$location', '$log', '$rootScope', fun
         sim.ws.send("S:" + map_name);
     }
 
+    sim.get_fish_on_frame = function(fish_id, frame) {
+        debugger
+        if(fish_id == 0) {
+            return;
+        }
+        return sim._frame_data[frame][fish_id];
+    }
+
     sim.get_fish_stream = function(callback) {
         var return_data = function(evt) {
             sim.ws.send('RA');

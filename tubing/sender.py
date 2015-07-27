@@ -1,7 +1,7 @@
-#!/usr/bin/python
+#!/usr/local/bin/python
 
 import sys
-sys.path.append("/work/protobuf/python/")
+sys.path.append("/work/td/usinha/protobuf/protobuf/python/")
 
 import os, errno
 import fish_sim_pb2
@@ -48,6 +48,7 @@ class SimHandler(tornado.websocket.WebSocketHandler):
 
     def on_message(self, message):
         if message == "RA" or message == "R":
+            print("Waiting for something to happen")
             # Request for a fish
             buff_size = self.fp.read(1)
 
@@ -80,7 +81,27 @@ class SimHandler(tornado.websocket.WebSocketHandler):
             # Start the simulator
             map_file = message.split(':')[1]
             print("Trying to run command")
-            subprocess.Popen(['../flock-solve', '%s/%s' % (MAP_PATH, map_file), self.filename])
+            #subprocess.Popen(['../flock-solve', '%s/%s' % (MAP_PATH, map_file), self.filename])
+            proc = ['../test.sh',
+                 '%s/%s' % (MAP_PATH, map_file), 
+                 10000,    # sleeptime
+                 10,       # Fish count
+                 5,        
+                 0.5,
+                 0.1,
+                 1.5,
+                 1,
+                 1,
+                 1,
+                 10,
+                 15,
+                 15,
+                 0.5,
+                 123,
+                 self.filename]
+            # Convert all parameters to string
+            proc = [str(x) for x in proc]
+            subprocess.Popen(proc)
             print("spanwed command")
             self._open_pipe()
             print("Connected to pipe")
@@ -99,8 +120,17 @@ class MapUploadHandler(tornado.web.RequestHandler):
             os.mkdir(MAP_PATH)
         file_data = self.request.files['file'][0]
 
+
         with open('%s/%s' % (MAP_PATH, file_data['filename']), 'w') as fp:
             fp.write(file_data['body'])
+
+        convert_cmd = ['vdb_map.sh', '%s/%s' % (MAP_PATH, file_data['filename'])]
+        print(convert_cmd)
+        try:
+	    subprocess.Popen(convert_cmd, cwd=os.path.abspath('../pipeline/'), stdout=subprocess.PIPE)
+        except OSError, e:
+            import pdb; pdb.set_trace()
+            
 
         return
 
@@ -137,13 +167,13 @@ class MapFetchHandler(tornado.web.RequestHandler):
         ret = {}
         map_data = []
 
-        map_filepath = '%s/%s' % (MAP_PATH, map_name)
+        map_filepath = '%s/%s.map' % (MAP_PATH, map_name)
         if not os.path.exists(map_filepath):
             # The file doesn't exist
             self.set_status(404)
             return
 
-        with open('%s/%s' % (MAP_PATH, map_name), 'r') as fp:
+        with open(map_filepath, 'r') as fp:
             map_data = [line.strip() for line in fp]
 
         ret['map'] = map_data

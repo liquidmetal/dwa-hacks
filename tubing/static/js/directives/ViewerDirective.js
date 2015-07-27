@@ -13,12 +13,17 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', fun
             var text, plane;
             var simtime = 0;
             var txt;
+            var pathGeometry;
+            var line;
+            var fishCounter = 0;
+            var firstTime = true;
 
             scope.targetRotation = 0;
             scope.targetRotationOnMouseDown = 0;
 
             scope.mouseX = 0;
             scope.mouseXOnMouseDown = 0;
+            scope.fishPositions = [];
 
             // In angular land, use $window instead of just window
             var windowHalfX = $window.innerWidth / 2;
@@ -89,7 +94,9 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', fun
                 scope.scene.add(scope.group_obstacle);
                 scope.scene.add(scope.group_fish);
 
-                scope.generate_obstacle_rect(scope.obstacle_tile_size, 0, 0);
+                //create buffer geometry
+                var geometry = new THREE.BufferGeometry();
+                var rectPositions = [];
 
                 // Loop over each point and create the obstacles
                 var x = 0, y = 0;
@@ -102,10 +109,83 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', fun
                         }
 
                         if(map_block_type=='#') {
-                            scope.generate_obstacle_rect(scope.obstacle_tile_size, x, y);
+                            var point  = {};
+                            point.x = x;
+                            point.y = y;
+                            rectPositions.push(point);
+                            //scope.generate_obstacle_rect(scope.obstacle_tile_size, x, y);
                         }
                     }
                 }
+
+                var indices = new Uint16Array( rectPositions.length * 6 );
+                var positions = new Float32Array( rectPositions.length * 2 * 3 * 3 );
+                var margin = 25;
+                //var normals = new Float32Array( triangles * 2 * 3 * 3 );
+                var colors = new Float32Array( rectPositions.length * 2 * 3 * 3 );
+                var color = new THREE.Color();
+                color.setRGB(1.0, 0.0, 0.0);
+
+                for (var i = 0; i < rectPositions.length; i++) {
+                    // first triangle 
+                    var x11 = margin + rectPositions[i].x * scope.obstacle_tile_size;
+                    var y11 = margin + (rectPositions[i].y + 1) * scope.obstacle_tile_size;
+                    var x12 = margin + (rectPositions[i].x + 1) * scope.obstacle_tile_size;
+                    var y12 = margin + (rectPositions[i].y + 1)* scope.obstacle_tile_size;
+                    var x13 = margin + (rectPositions[i].x) * scope.obstacle_tile_size;
+                    var y13 = margin + (rectPositions[i].y) * scope.obstacle_tile_size;
+
+                    // second triangle 
+                    var x23 = margin + (rectPositions[i].x) * scope.obstacle_tile_size;
+                    var y23 = margin + (rectPositions[i].y + 1) * scope.obstacle_tile_size;
+                    var x22 = margin + (rectPositions[i].x + 1) * scope.obstacle_tile_size;
+                    var y22 = margin + (rectPositions[i].y) * scope.obstacle_tile_size;
+                    var x21 = margin + (rectPositions[i].x + 1) * scope.obstacle_tile_size;
+                    var y21 = margin + (rectPositions[i].y + 1) * scope.obstacle_tile_size;
+
+                    positions[i*18 + 0] = x11;
+                    positions[i*18 + 1] = y11;
+                    positions[i*18 + 2] = 0;
+                    positions[i*18 + 3] = x12;
+                    positions[i*18 + 4] = y13;
+                    positions[i*18 + 5] = 0;
+                    positions[i*18 + 6] = x13;
+                    positions[i*18 + 7] = y13;
+                    positions[i*18 + 8] = 0;
+                    positions[i*18 + 9] = x21;
+                    positions[i*18 + 10] = y21;
+                    positions[i*18 + 11] = 0;
+                    positions[i*18 + 12] = x22;
+                    positions[i*18 + 13] = y22;
+                    positions[i*18 + 14] = 0;
+                    positions[i*18 + 15] = x23;
+                    positions[i*18 + 16] = y23;
+                    positions[i*18 + 17] = 0;
+
+                    for (var c = 0; c < 6; c++) {
+                        colors[i*18 + c*3] = 1.0;
+                        colors[i*18 + c*3 + 1] = 1.0;
+                        colors[i*18 + c*3 + 2] = 0.0;
+                    }
+                    
+                    indices[i*6] = i*6 ;
+                    indices[i*6 + 1] = i*6 + 1;
+                    indices[i*6 + 2] = i*6 + 2;
+                    indices[i*6 + 3] = i*6 + 3;
+                    indices[i*6 + 4] = i*6 + 4;
+                    indices[i*6 + 5] = i*6 + 5;
+                }
+
+                geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+                geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+                //geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+                geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+                geometry.computeBoundingSphere();
+
+                var material = new THREE.MeshBasicMaterial( { color: 0xA52A2A } );
+
+                mesh = new THREE.Mesh( geometry, material );
+                scope.scene.add( mesh );
 
                 return;
             }
@@ -118,6 +198,7 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', fun
                 rectShape.lineTo( size, 0 );
                 rectShape.lineTo( 0, 0 );
                 var margin = 25;
+                
                 var transformed_rect = scope._addShape( 0, rectShape, 0x9CD3DB, margin + tile_x*size, 0, margin + tile_y*size, 0, 0, 0, 1 );
                 scope.group_obstacle.add(transformed_rect);
                 return;
@@ -148,7 +229,7 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', fun
                 scope.scene = new THREE.Scene();
                 scope.group = new THREE.Group();
 
-                scope.group.position.y = 50;
+                //scope.group.position.y = 0;
                 scope.scene.add( scope.group );
 
                 renderer = new THREE.WebGLRenderer();
@@ -235,7 +316,7 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', fun
 
                 var mesh = new THREE.Mesh( geometry, material );
                 //mesh.position.set( x, y, z );
-                var axis = new THREE.Vector3( 0, 1, 1 );
+                //var axis = new THREE.Vector3( 0, 1, 1 );
                 mesh.rotation.set( rx, ry, rz );
                 mesh.scale.set( s, s, s );
                 
@@ -265,17 +346,12 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', fun
                 texture = THREE.ImageUtils.loadTexture("/static/img/babelfish.png");
                 var material = new THREE.SpriteMaterial( { map: texture } );
 
-                var width = 128;
-                var height = 128;
-            
                 mesh = new THREE.Sprite( material );
-                //mesh.scale.set( width, height, 1 );
                 
                 //mesh.position.set( x, y, z );
-                var axis = new THREE.Vector3( 0, 1, 1 );
-                mesh.rotation.set( rx, ry, rz );
+                //mesh.rotation.set( rx, ry, rz );
 
-                mesh.position.set( x, z, y );
+                //mesh.position.set( x, y, z );
                 mesh.scale.set( s, s, s );
 
                 idShapeMap[id] = mesh;
@@ -329,6 +405,47 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', fun
                 
                         
             }
+
+            function addfishTriangle(id, x, y, rx, ry, s) {
+                // Fish
+                //x = y = 0;
+                rx = typeof rx !== 'undefined' ? rx : 0;
+                ry = typeof ry !== 'undefined' ? ry : 0;
+                s = typeof s !== 'undefined' ? s : 1;
+                var margin = 25;
+                
+                var geometry = new THREE.BufferGeometry();
+                // create a simple square shape. We duplicate the top left and bottom right
+                // vertices because each vertex needs to appear once per triangle. 
+                var vertexPositions = [ 
+                    [ -0.2 * scope.obstacle_tile_size, 0.2 * scope.obstacle_tile_size,  0.0],
+                    [ +0.2 * scope.obstacle_tile_size, 0.0 ,  0.0],
+                    [ -0.2 * scope.obstacle_tile_size, -0.2 * scope.obstacle_tile_size,  0.0]
+                ];
+                var vertices = new Float32Array( vertexPositions.length * 3 ); // three components per vertex
+
+                // components of the position vector for each vertex are stored
+                // contiguously in the buffer.
+                for ( var i = 0; i < vertexPositions.length; i++ )
+                {
+                    vertices[ i*3 + 0 ] = vertexPositions[i][0];
+                    vertices[ i*3 + 1 ] = vertexPositions[i][1];
+                    vertices[ i*3 + 2 ] = vertexPositions[i][2];
+                }
+
+                // itemSize = 3 because there are 3 values (components) per vertex
+                geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+                var material = new THREE.MeshBasicMaterial( { color: 0x000000 } );
+                var mesh = new THREE.Mesh( geometry, material );
+                //scope.group.add( mesh );
+
+                var transform = new THREE.Group();
+                transform.add(mesh);
+                transform.position.set( x, y, 0 );
+                idShapeMap[id] = transform;
+
+                scope.group.add(transform);
+            }
             
             function addFrame() {
                 // Rectangle frame Window
@@ -375,26 +492,13 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', fun
             }
             
             function testSimple() {
-                //addFrame();
+                addFrame();
                 var points = [200, 200, 250, 200, 250, 250, 300, 250, 300, 300, 200, 300];
                 //addObstacles(1, points);
                 //addfish1(2, 0, 0, 0, Math.PI, 1);   
-                addfishBlock(2, 0, 0, 0, Math.PI/2, scope.obstacle_tile_size);
-                addfishBlock(3, 0, 0, 0, Math.PI/2, scope.obstacle_tile_size); 
-                addfishBlock(4, 0, 0, 0, Math.PI/2, scope.obstacle_tile_size);            
-
-                var margin = 25;
-                var geometry = new THREE.Geometry();
-                for (i = 0; i < txt.length; i = i+8) { 
-                     geometry.vertices.push(new THREE.Vector3(margin + txt[i]*scope.obstacle_tile_size, margin + txt[i+1]*scope.obstacle_tile_size, 0));
-                }
-                var material = new THREE.LineBasicMaterial({
-                        color: 0x0000ff
-                });
-
-                var line = new THREE.Line(geometry, material);
-                scope.scene.add(line);
-                scope.scene.add(scope.group);
+                //addfishBlock(2, 0, 0, 0, Math.PI/2, 10);
+                //addfishBlock(3, 0, 0, 0, Math.PI/2, 10); 
+                //addfishBlock(4, 0, 0, 0, Math.PI/2, 10);            
             }               
             
             function testfishOrientation() {
@@ -472,26 +576,76 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', fun
             }
             
             scope.update = function() {
-<<<<<<< HEAD
                 // TODO come up with a way to find out the current frame number
                 var fish_count = Sim.get_fish_count();
                 if(fish_count == 0) {
                     return;
                 }
 
-                for(var i=0;i<fish_count;i++) {
-                    console.log(Sim.get_fish_on_frame(i, Math.floor(scope.frameNumber/60)));        // fish_id 0 at frame 0
-                    var fishData = Sim.get_fish_on_frame(i, Math.floor(scope.frameNumber/60));
-                    var shape = idShapeMap[fishData.fish_id + 2];
-                        
-                    shape.position.x = parseFloat(fishData.pos_x)*scope.obstacle_tile_size;
-                    shape.position.y = parseFloat(fishData.pos_y)*scope.obstacle_tile_size;
-                    //console.log(fishData.pos_x + "," fishData.pos_y);
+                var margin = 25;
+                if (firstTime) {
+                    /*pathGeometry = new THREE.Geometry();
+                    for (i = 0; i < 100; i++) { 
+                        pathGeometry.vertices.push(new THREE.Vector3(margin, margin, 0));
+                    }
+                    var material = new THREE.LineBasicMaterial({
+                        color: 0x0000ff
+                    });
 
+                    line = new THREE.Line(pathGeometry, material);*/
+                    //scope.scene.add(line);
+                    scope.scene.add(scope.group);
+                    firstTime = false;
+                        
+                    for(var i=0;i<fish_count;i++) {
+                        var fishData = Sim.get_fish_on_frame(i, Math.floor(scope.frameNumber));
+                        
+                        var x = margin + parseFloat(fishData.pos_x)*scope.obstacle_tile_size + scope.obstacle_tile_size/2;
+                        var y = margin + parseFloat(fishData.pos_y)*scope.obstacle_tile_size + scope.obstacle_tile_size/2;
+
+                        addfishTriangle(i+1, x, y, 0, Math.PI/2, 1);
+                        //addfishBlock(i+1, x, y, 0, Math.PI/2, 10);
+                    }
+                } else {
+                    //console.log(Sim.get_fish_on_frame(0, Math.floor(scope.frameNumber/60)));
+                    /*
+                    var pathData = Sim.get_fish_on_frame(0, Math.floor(scope.frameNumber));
+
+                    line.geometry.vertices[Math.floor(scope.frameNumber/60)].x = margin +  parseFloat(pathData.pos_x)*scope.obstacle_tile_size 
+                                                                                            + scope.obstacle_tile_size/2;
+                    line.geometry.vertices[Math.floor(scope.frameNumber/60)].y = margin +  parseFloat(pathData.pos_y)*scope.obstacle_tile_size
+                                                                                            + scope.obstacle_tile_size/2;
+
+                    line.geometry.verticesNeedUpdate = true;
+                    */
+
+                    for(var i=0;i<fish_count;i++) {
+                        //console.log(Sim.get_fish_on_frame(i, Math.floor(scope.frameNumber/60)));        // fish_id 0 at frame 0
+                        var fishData = Sim.get_fish_on_frame(i, Math.floor(scope.frameNumber));
+                        if(shape && shape.hasOwnProperty('position')) {
+                            var shape = idShapeMap[fishData.fish_id + 1];
+                            
+                            // calculate the orientation
+                            var prevX = shape.position.x;
+                            var prevY = shape.position.y;
+
+                            shape.position.x = margin + parseFloat(fishData.pos_x)*scope.obstacle_tile_size + scope.obstacle_tile_size/2;
+                            shape.position.y = margin + parseFloat(fishData.pos_y)*scope.obstacle_tile_size + scope.obstacle_tile_size/2;
+
+                            var vectorX = shape.position.x - prevX;
+                            var vectorY = shape.position.y - prevY;
+
+                            var dot = vectorX*1 + vectorY*0      // dot product
+                            var det = vectorX*1 - vectorY*0      // determinant
+                            var angle = Math.atan2(det, dot)  // atan2(y, x) or atan2(sin, cos)
+                            shape.rotation.z = angle;
+                        }
+
+                        //shape.rotation.z += 0.1;
+                    }
                 }
+
                 scope.frameNumber += 1;
-=======
->>>>>>> ae381a8316d4ab10bfdf87110947e7ebae9aacfe
                 /*// TBD - do this for every data packet received
                 {
                         
@@ -549,8 +703,9 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', fun
                 }
 
                 scope._clear_scene();
+                //addFrame();
                 scope._generate_map_scene();
-                testSimple();
+                //testSimple();
             }, true);
 
             scope.$watch(function() {
@@ -562,11 +717,7 @@ angular.module('fishApp').directive('fishViewer', ['$log', '$window', 'Sim', fun
                 $log.log("New fish created: " + newval);
                 var current_frame = Sim.get_current_frame();
                 var pos = Sim.get_fish_position(current_frame, newval-1);
-<<<<<<< HEAD
-=======
-                debugger
->>>>>>> ae381a8316d4ab10bfdf87110947e7ebae9aacfe
-                scope.addfish1(newval-1, 25 + pos.pos_x, 25 + pos.pos_y, 0, 0, 0.05);
+                scope.addfish(newval-1, 25 + pos.pos_x, 25 + pos.pos_y, 0, 0, 0.05);
             });
 
             scope.init();

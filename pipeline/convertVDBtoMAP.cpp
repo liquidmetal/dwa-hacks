@@ -31,25 +31,39 @@ int main(int argc,char** argv)
     //cast the generic grid pointer to a FloatGrid pointer.
     openvdb::FloatGrid::Ptr grid = openvdb::gridPtrCast<openvdb::FloatGrid>(baseGrid);
 
-    int x_bound = 100;
-    int z_bound = 100;
-    int y_bound = 1;
 
-    float grid_array[x_bound][z_bound];
+    string boundx = grid->metaValue<string>("boundx");
+    string boundy = grid->metaValue<string>("boundy");
+    string startx = grid->metaValue<string>("startx");
+    string starty = grid->metaValue<string>("starty");
+    string start_radius = grid->metaValue<string>("start_radius");
+    string endx = grid->metaValue<string>("endx");
+    string endy = grid->metaValue<string>("endy");
+    string end_radius = grid->metaValue<string>("end_radius");
 
-    for(int i=0;i<x_bound;i++)
-        for(int k=0;k<z_bound;k++) {
-            grid_array[i][k]=-999;
-        }
+    int x_boundary = stoi(boundx);
+    int y_boundary = stoi(boundy);
 
-    for (openvdb::FloatGrid::ValueOnCIter iter = grid->cbeginValueOn(); iter; ++iter) {
-        openvdb::Coord pos = iter.getCoord();
+    float startRadius = stof(start_radius);
+    float endRadius = stof(end_radius);
 
-        if((pos.x()>=x_bound||pos.z()>=z_bound||pos.x()<0||pos.z()<0)||pos.y()!=y_bound) {
-            continue;
-        }
+    int x_bound = x_boundary;
+    int y_bound = y_boundary;
+    int z_bound = 0; 
 
-        grid_array[pos.x()][pos.z()]=*iter;
+
+    float grid_array[x_bound][y_bound];
+
+   
+    openvdb::FloatGrid::Accessor accessor = grid->getAccessor();
+    
+    for(int x=0;x<x_bound;x++) 
+    for(int y=0;y<y_bound;y++) 
+    {
+            openvdb::Coord pos(x,y,z_bound);
+            grid_array[x][y] = accessor.getValue(pos);
+     
+        //std::cout<<"Grid array "<<grid_array[x][y]<<"\n";
     }
 
 
@@ -58,8 +72,8 @@ int main(int argc,char** argv)
         outMapFile.open (outFileName);
         
         for(int x =x_bound-1;x>=0;x-=1) {
-            for(int z =0;z<z_bound;z+=1) {	
-                if(grid_array[x][z]<=0&&grid_array[x][z]!=-999)
+            for(int y =0;y<y_bound;y+=1) {	
+                if(grid_array[x][y]<=0&&grid_array[x][y]!=-999)
                     outMapFile<<"#";
                 else
                     outMapFile<<".";

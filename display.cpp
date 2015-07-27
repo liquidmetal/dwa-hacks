@@ -33,6 +33,7 @@ void openPipe(char* pipeFile)
         return;
     }
 
+    printf("The pipefile is %s\n", pipeFile);
     /* create the FIFO (named pipe) */
     mkfifo(pipeFile, 0700);
     fd.open(pipeFile, std::fstream::out);
@@ -98,7 +99,7 @@ int simMain(int argc, char* argv[])
 
 
     char* pipeFile = nullptr;
-    if(argc==16)
+    if(argc==17)
     {
         pipeFile = argv[16];
         std::cout<<"\nPipe File "<<pipeFile<"\n";
@@ -276,23 +277,12 @@ void DrawGLScene()
     	
         vector<Boid>& boids = flockDisplay->boids;
 
-        FishSim fish;
-    	// Fish 0 is the path information
-    		fish.set_fish_id(0);
-    		fish.set_pos_x(0);
-    		fish.set_pos_y(0);
-    		char sz = fish.ByteSize();
-    		if(bWriteToPipe) {
-    		    fd.write(&sz, sizeof(char));
-    		    fish.SerializeToOstream(&fd);
-    		}
-
         for(int i =0; i< boids.size() ; i++)
         {
 
         	FishSim fish;
     		// Fish 0 is the path information
-    		fish.set_fish_id(i+1);
+    		fish.set_fish_id(i);
     		fish.set_pos_x(boids[i].loc.x);
     		fish.set_pos_y(boids[i].loc.y);
     		char sz = fish.ByteSize();
@@ -319,6 +309,8 @@ void DrawGLScene()
         }
 
     }
+
+    fd.flush();
 
 
     // we need to swap the buffer to display our drawing.

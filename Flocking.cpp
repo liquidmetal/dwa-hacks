@@ -16,7 +16,13 @@ int Flocking::update()
         if(useCollisionFromSDF)
         {
             Vec2f dir = partialDerivaties[(int)boids[i].loc.x][(int)boids[i].loc.y];
-			boids[i].seek(dir+boids[i].loc,dir.length()*collisionWeight);
+
+            float val = collisionSDF[(int)boids[i].loc.x][(int)boids[i].loc.y];
+            
+            if(val==0)
+            	val=0.001;
+
+			boids[i].seek(dir+boids[i].loc,dir.length()*collisionWeight/val);
 
         }
 
@@ -29,7 +35,7 @@ int Flocking::update()
             if(path.size()>1)
             {
                 Vec2f dest = path[min((int)path.size()-1,1)]; //!@#
-                boids[i].seek(dest,0.5); //seek the Goal !@#
+                boids[i].seek(dest,destWeight); //seek the Goal !@#
             }
 			*/
 
@@ -51,6 +57,7 @@ int Flocking::update()
 
     centroid /=flockSize();
 
+    
     if(sceneMap->getCell(centroid.x,centroid.y))
     	{
         	
@@ -58,13 +65,14 @@ int Flocking::update()
             path = pathFinder.getPath(sceneMap,centroid);
             if(path.size()>1)
             {
-                destinationSeek = path[min((int)path.size()-1,10)]; 
+                destinationSeek = path[min((int)path.size()-1,5)]; 
                 
             }
 			
 
             
         }
+        
 
     if(flockSize()==0)
         return 0;
