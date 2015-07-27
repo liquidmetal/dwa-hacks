@@ -3,6 +3,8 @@
 #include "Vector.h"
 #include "Grid.h"
 
+/****************** Class that defines a Scene **************/
+
 using namespace math;
 
 struct Cell

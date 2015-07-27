@@ -5,12 +5,11 @@
 #include <unistd.h>     // Header File for sleeping.
 #include <string.h>
 #include <thread>
-
+#include <iostream>
 #include "Simulation.h"
 
+/*************** This is code for the native viewer. ********************/
 
-//#include "Simulation.h"
-#include <iostream>
 
 /* ASCII code for the escape key. */
 #define ESCAPE 27
@@ -20,24 +19,6 @@ int window;
 
 Flocking* flockDisplay;
 Scene* sceneDisplay;
-
-//std::vector<DispFish> display_fishes;
-std::fstream fd;
-bool bWriteToPipe=false;
-void openPipe(char* pipeFile)
-{
-    if(pipeFile == nullptr) {
-        // Don't open the pipe if the pipe file arg wasn't passed
-        // Useful when debugging
-        bWriteToPipe = false;
-        return;
-    }
-
-    /* create the FIFO (named pipe) */
-    mkfifo(pipeFile, 0700);
-    fd.open(pipeFile, std::fstream::out);
-    bWriteToPipe = true;
-}
 
 int simMain(int argc, char* argv[])
 {
@@ -97,18 +78,9 @@ int simMain(int argc, char* argv[])
     int randSeed 				= stoi(random_seed);
 
 
-    char* pipeFile = nullptr;
-    if(argc==16)
-    {
-        pipeFile = argv[16];
-        std::cout<<"\nPipe File "<<pipeFile<"\n";
-    }
-
-    openPipe(pipeFile);
-
     Simulation simulation;
     simulation.loadScene(mapFile);
-    simulation.init(pipeFile,sleepTime,
+    simulation.init(sleepTime,
 			    	fishCount,boundaryPadding,
 			    	maxSpeed,maxForce,
 			    	flockSepWeight,
@@ -270,40 +242,12 @@ void DrawGLScene()
     }
 
 
-    if(flockDisplay)
-    {
+    if(flockDisplay) {
 
-    	
         vector<Boid>& boids = flockDisplay->boids;
-
-        FishSim fish;
-    	// Fish 0 is the path information
-    		fish.set_fish_id(0);
-    		fish.set_pos_x(0);
-    		fish.set_pos_y(0);
-    		char sz = fish.ByteSize();
-    		if(bWriteToPipe) {
-    		    fd.write(&sz, sizeof(char));
-    		    fish.SerializeToOstream(&fd);
-    		}
 
         for(int i =0; i< boids.size() ; i++)
         {
-
-        	FishSim fish;
-    		// Fish 0 is the path information
-    		fish.set_fish_id(i+1);
-    		fish.set_pos_x(boids[i].loc.x);
-    		fish.set_pos_y(boids[i].loc.y);
-    		char sz = fish.ByteSize();
-    		if(bWriteToPipe) {
-    		    fd.write(&sz, sizeof(char));
-    		    fish.SerializeToOstream(&fd);
-    		}
-        	
-
-
-
             glPushMatrix();
             if(!boids[i].reachedDestination)
             {

@@ -3,6 +3,8 @@
 #include <cmath>
 #include <iostream>
 
+/************** A little library for vector operations (the physics vectors, not C++)*********/
+
 namespace math {
 
 #define PI 3.14159265

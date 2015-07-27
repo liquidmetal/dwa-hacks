@@ -4,6 +4,7 @@
 #include<memory.h>
 #endif
 
+/************ Class that define a grid ***************/
 template <class T>
 class Grid
 {

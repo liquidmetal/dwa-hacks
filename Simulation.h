@@ -11,7 +11,6 @@
 #include "Vector.h"
 #include "PathFinder.h"
 #include "Flocking.h"
-#include "fish-sim.pb.h"
 #include "MapLoader.h"
 
 
@@ -21,8 +20,7 @@ class Simulation
 {
 public:
 	void loadScene(char* mapFile);
-	void init(char* pipeFile				,
-              	long 	msleepTime 			,
+	void init( 	long 	msleepTime 			,
               	int 	mfishCount 			,
               	int 	mboundaryPadding 	,
               	float 	mmaxSpeed 			,
@@ -37,7 +35,7 @@ public:
            		float 	mdestWeight 		,
            		int 	mrandSeed 			);
 
-	bool frame();
+	bool updateLoop();
 	void run();
 	long long totalTime();
 
@@ -51,10 +49,6 @@ public:
     }
 
 private:
-
-	void openPipe(char* pipeFile);
-	void closePipe();
-    bool bWriteToPipe = false;
 
     Flocking flock;
 	Scene* mScene;

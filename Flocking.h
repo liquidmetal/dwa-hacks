@@ -33,7 +33,7 @@ public:
            			
     
 
-//private:
+
     int x_bound,y_bound;
     Vec2f destination;
     float destinationArea;
