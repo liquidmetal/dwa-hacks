@@ -15,12 +15,10 @@ public:
     unsigned int getNumCols();
     float** getSDF(); // call this only if loadVDBMap() was called
     MapLoader();
-<<<<<<< HEAD
+
     std::vector<math::Vec2d> getFishesFromMap();
-=======
     unsigned int getStartRadius();
     unsigned int getEndRadius();
->>>>>>> usama
 
 private:
     bool** mapData;         // Stores the passibility of each block
